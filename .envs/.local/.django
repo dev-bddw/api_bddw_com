@@ -1,0 +1,5 @@
+# General
+# ------------------------------------------------------------------------------
+USE_DOCKER=yes
+IPYTHONDIR=/app/.ipython
+API_AUTH_TOKEN=d9239c1b5120c7860c3b0c168da0da0fc4ff613b
