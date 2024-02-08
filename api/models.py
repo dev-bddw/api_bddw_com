@@ -47,3 +47,6 @@ class MenuListItem(models.Model):
 
 class DropDownMenu(models.Model):
     data = models.JSONField(null=True, blank=True)
+
+    def __str__(self):
+        return f"BDDW.COM DROPDOWN MENU #{self.id}"

@@ -1,5 +1,5 @@
 # define an alias for the specific python version used in this file.
-FROM docker.io/python:3.11.7-slim-bookworm as python
+FROM docker.io/python3.11-nodejs21-slim	 as python
 
 # Python build stage
 FROM docker.io/python as python-build-stage
@@ -46,7 +46,8 @@ RUN groupadd --gid 1000 dev-user \
 
 
 # Install required system dependencies
-RUN apt-get update && apt-get install --no-install-recommends -y \
+# isntall npm so we can install prettier
+RUN apt-get update && apt-get install -y npm && apt-get install --no-install-recommends -y \
   # psycopg2 dependencies
   libpq-dev \
   # Translations dependencies
@@ -71,7 +72,8 @@ COPY ./compose/local/django/start /start
 RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
 
-
+# install prettier
+RUN npm install --global prettier
 
 # copy application code to WORKDIR
 COPY . ${APP_HOME}
