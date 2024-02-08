@@ -1,4 +1,4 @@
-cd /home/ubuntu/django-projects/bddw_prices
+cd /home/ubuntu/django-projects/api_bddw_com
 git pull origin production
 sudo docker compose -f production.yml down
 sudo docker compose -f production.yml run --rm django python manage.py migrate
