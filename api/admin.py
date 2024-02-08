@@ -1,10 +1,11 @@
 from django.contrib import admin
 from .models import Product, ProductImage, MenuList, MenuListItem, DropDownMenu
+from .forms import DropDownMenuModelForm
 
 
 @admin.register(DropDownMenu)
 class DropDownMenuAdmin(admin.ModelAdmin):
-    pass
+    form = DropDownMenuModelForm
 
 
 @admin.register(Product)
