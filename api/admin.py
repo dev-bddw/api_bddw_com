@@ -2,6 +2,9 @@ from django.contrib import admin
 from .models import Product, ProductImage, MenuList, MenuListItem, DropDownMenu
 from .forms import DropDownMenuModelForm
 
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 10
 
 @admin.register(DropDownMenu)
 class DropDownMenuAdmin(admin.ModelAdmin):
@@ -10,6 +13,7 @@ class DropDownMenuAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    inlines = [ProductImageInline]
     list_display = ("name", "created_on")
     search_fields = ("name",)
 
