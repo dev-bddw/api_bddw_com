@@ -7,8 +7,8 @@ from .serializers import ProductSerializer, MenuListSerializer, DropDownMenuSeri
 
 special_cases = {
                  'sev-drulo-series': 'sev-drulo series',
-                 'sev-drulo-club-char': 'sev-drulo club chair',
-                 'sev-drulo-sofa': 'sev-drulo sectional sofa'
+                 'sev-drulo-club-chair': 'sev-drulo club chair',
+                 'sev-drulo-sectional-sofa': 'sev-drulo sectional sofa'
                  }
 
 
