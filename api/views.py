@@ -5,13 +5,19 @@ from rest_framework import status
 from .models import Product, MenuList, DropDownMenu
 from .serializers import ProductSerializer, MenuListSerializer, DropDownMenuSerializer
 
+hyphen_dict = { 'sev-drulo-series': 'sev-drulo series'}
+
 
 @api_view(["GET", "PUT"])
 @parser_classes([MultiPartParser, FormParser])
 def api_response(request, slug=None):
     instance = None
     serializer_class = None
-    slug = slug.lower().replace("-", " ")
+
+    if slug not in special_cases.keys():
+        slug = slug.lower().replace("-", " ")
+    else:
+        slug = hyphen_dict[slug]
 
     # Try to get MenuList by slug
     try:
