@@ -30,15 +30,16 @@ class ProductImageAdmin(admin.ModelAdmin):
     search_fields = ("product__name",)
 
 
-@admin.register(MenuList)
-class MenuListAdmin(admin.ModelAdmin):
-    list_display = ("name", "created_on")
-    search_fields = ("name",)
-
-
 class MenuListItemInline(admin.TabularInline):
     model = MenuListItem
-    extra = 1
+    extra = 10
+
+
+@admin.register(MenuList)
+class MenuListAdmin(admin.ModelAdmin):
+    inlines = [MenuListItemInline]
+    list_display = ("name", "created_on")
+    search_fields = ("name",)
 
 
 @admin.register(MenuListItem)
