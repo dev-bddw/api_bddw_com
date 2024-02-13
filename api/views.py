@@ -5,7 +5,7 @@ from rest_framework import status
 from .models import Product, MenuList, DropDownMenu
 from .serializers import ProductSerializer, MenuListSerializer, DropDownMenuSerializer
 
-hyphen_dict = { 'sev-drulo-series': 'sev-drulo series'}
+special_cases = { 'sev-drulo-series': 'sev-drulo series'}
 
 
 @api_view(["GET", "PUT"])
