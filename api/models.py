@@ -7,26 +7,26 @@ from simple_history.models import HistoricalRecords
 
 class CloudFrontImageField(models.ImageField):
     def save(self, *args, **kwargs):
+
+        client = boto3.client(
+            'cloudfront',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name='us-east-1'  # Specify the appropriate region
+        )
+        distribution_id = settings.CLOUDFLARE_DISTRIBUTION_ID
+        path = '/' + self.name
+        response = client.create_invalidation(
+            DistributionId=distribution_id,
+            InvalidationBatch={
+                'Paths': {'Quantity': 1, 'Items': [path]},
+                'CallerReference': str(time.time())
+            }
+        )
+
         super().save(*args, **kwargs)
 
-        try:
-            client = boto3.client(
-                'cloudfront',
-                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                region_name='us-east-1'  # Specify the appropriate region
-            )
-            distribution_id = settings.CLOUDFLARE_DISTRIBUTION_ID
-            path = '/' + self.name
-            response = client.create_invalidation(
-                DistributionId=distribution_id,
-                InvalidationBatch={
-                    'Paths': {'Quantity': 1, 'Items': [path]},
-                    'CallerReference': str(time.time())
-                }
-            )
-        except Exception as e:
-            print(e)
+
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
