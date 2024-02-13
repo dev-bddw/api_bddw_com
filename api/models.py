@@ -1,8 +1,9 @@
 from django.db import models
 from django.conf import settings
+from simple_history.models import HistoricalRecords
+
 import time
 import boto3
-from simple_history.models import HistoricalRecords
 
 
 class CloudFrontImageField(models.ImageField):
@@ -14,8 +15,9 @@ class CloudFrontImageField(models.ImageField):
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
             region_name='us-east-1'  # Specify the appropriate region
         )
-        distribution_id = settings.CLOUDFLARE_DISTRIBUTION_ID
-        path = '/' + self.name
+
+        distribution_id = 'EWK3EMFHZGQ8'
+        path = '/' + 'woad-sofa.jpeg'
         response = client.create_invalidation(
             DistributionId=distribution_id,
             InvalidationBatch={
