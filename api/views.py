@@ -5,7 +5,11 @@ from rest_framework import status
 from .models import Product, MenuList, DropDownMenu
 from .serializers import ProductSerializer, MenuListSerializer, DropDownMenuSerializer
 
-special_cases = { 'sev-drulo-series': 'sev-drulo series'}
+special_cases = {
+                 'sev-drulo-series': 'sev-drulo series',
+                 'sev-drulo-club-char': 'sev-drulo club chair',
+                 'sev-drulo-sofa': 'sev-drulo sectional sofa'
+                 }
 
 
 @api_view(["GET", "PUT"])
