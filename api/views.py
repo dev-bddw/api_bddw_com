@@ -17,7 +17,7 @@ def api_response(request, slug=None):
     if slug not in special_cases.keys():
         slug = slug.lower().replace("-", " ")
     else:
-        slug = hyphen_dict[slug]
+        slug = special_cases[slug]
 
     # Try to get MenuList by slug
     try:
