@@ -9,7 +9,7 @@ class CloudFrontImageField(models.ImageField):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        if settings.DJANGO_SETTINGS_MODULE == 'config.settings.production':
+        if settings.SETTINGS_MODULE == 'config.settings.production':
             # Invalidate CloudFront cache here
             # Note: Ensure you implement error handling and consider performance implications
             client = boto3.client('cloudfront')
