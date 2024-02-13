@@ -8,14 +8,11 @@ FROM docker.io/python as python-build-stage
 ARG BUILD_ENVIRONMENT=production
 
 # Install apt packages
-RUN apt-get update && apt-get install -y npm && apt-get install --no-install-recommends -y \
+RUN apt-get update && apt-get install --no-install-recommends -y \
   # dependencies for building Python packages
   build-essential \
   # psycopg2 dependencies
   libpq-dev
-
-# install prettier
-RUN npm install --global prettier
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements .
@@ -42,7 +39,7 @@ RUN addgroup --system django \
 
 
 # Install required system dependencies
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN apt-get update && apt-get install -y npm && apt-get install --no-install-recommends -y \
   # psycopg2 dependencies
   libpq-dev \
   # Translations dependencies
@@ -50,6 +47,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
+
+# install prettier
+RUN npm install --global prettier
 
 # All absolute dir copies ignore workdir instruction. All relative dir copies are wrt to the workdir instruction
 # copy python dependency wheels from python-build-stage
