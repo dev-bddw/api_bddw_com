@@ -3,23 +3,27 @@ from django.conf import settings
 import time
 import boto3
 from simple_history.models import HistoricalRecords
-
+import logging
+logger = logging.getLogger(__name__)
 
 class CloudFrontImageField(models.ImageField):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        if settings.SETTINGS_MODULE == 'config.settings.production':
+        try:
             client = boto3.client('cloudfront')
             distribution_id = settings.CLOUDFLARE_DISTRIBUTION_ID
             path = '/' + self.name
-            client.create_invalidation(
+            response = client.create_invalidation(
                 DistributionId=distribution_id,
                 InvalidationBatch={
                     'Paths': {'Quantity': 1, 'Items': [path]},
                     'CallerReference': str(time.time())
                 }
             )
+            logger.info("CloudFront invalidation created: %s", response)
+        except Exception as e:
+            logger.error("Error creating CloudFront invalidation: %s", e)
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
