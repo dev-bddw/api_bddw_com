@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y npm && apt-get install --no-install-rec
   # psycopg2 dependencies
   libpq-dev
 
+# install prettier
+RUN npm install --global prettier
+
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements .
 
@@ -69,9 +72,6 @@ RUN chmod +x /start
 
 # copy application code to WORKDIR
 COPY --chown=django:django . ${APP_HOME}
-
-# install prettier
-RUN npm install --global prettier
 
 # make django owner of the WORKDIR directory as well.
 RUN chown django:django ${APP_HOME}
