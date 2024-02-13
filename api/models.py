@@ -10,11 +10,9 @@ class CloudFrontImageField(models.ImageField):
         super().save(*args, **kwargs)
 
         if settings.SETTINGS_MODULE == 'config.settings.production':
-            # Invalidate CloudFront cache here
-            # Note: Ensure you implement error handling and consider performance implications
             client = boto3.client('cloudfront')
             distribution_id = settings.CLOUDFLARE_DISTRIBUTION_ID
-            path = self.name  # Dynamically construct the path based on your application's logic
+            path = '/' + self.name
             client.create_invalidation(
                 DistributionId=distribution_id,
                 InvalidationBatch={
