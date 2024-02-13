@@ -1,6 +1,6 @@
 
 # define an alias for the specific python version used in this file.
-FROM docker.io/python:3.11.7-slim-bookworm as python
+FROM docker.io/python3.11-nodejs21-slim	 as python
 
 # Python build stage
 FROM docker.io/python as python-build-stage
@@ -8,7 +8,7 @@ FROM docker.io/python as python-build-stage
 ARG BUILD_ENVIRONMENT=production
 
 # Install apt packages
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN apt-get update && apt-get install -y npm && apt-get install --no-install-recommends -y \
   # dependencies for building Python packages
   build-essential \
   # psycopg2 dependencies
@@ -69,6 +69,9 @@ RUN chmod +x /start
 
 # copy application code to WORKDIR
 COPY --chown=django:django . ${APP_HOME}
+
+# install prettier
+RUN npm install --global prettier
 
 # make django owner of the WORKDIR directory as well.
 RUN chown django:django ${APP_HOME}

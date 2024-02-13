@@ -192,3 +192,4 @@ SPECTACULAR_SETTINGS["SERVERS"] = [  # noqa: F405
 ]
 # Your stuff...
 # ------------------------------------------------------------------------------
+CLOUDFLARE_DISTRIBUTION_ID = env('CLOUDFLARE_DISTRIBUTION_ID', None)

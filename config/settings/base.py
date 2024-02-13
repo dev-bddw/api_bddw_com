@@ -302,3 +302,5 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+DJANGO_SETTINGS_MODULE = env('DJANGO_SETTINGS_MODULE', default="config.settings.local")
