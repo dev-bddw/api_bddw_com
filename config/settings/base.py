@@ -79,6 +79,7 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "drf_spectacular",
+    'simple_history',
 ]
 
 LOCAL_APPS = ["api_bddw_com.users", "api"]
@@ -136,6 +137,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 # STATIC
