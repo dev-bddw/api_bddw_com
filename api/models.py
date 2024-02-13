@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 import time
 import boto3
+from simple_history.models import HistoricalRecords
+
 
 class CloudFrontImageField(models.ImageField):
     def save(self, *args, **kwargs):
@@ -23,9 +25,10 @@ class CloudFrontImageField(models.ImageField):
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
-    blurb = models.TextField()
+    blurb = models.TextField(null=True, blank=True)
     meta = models.JSONField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.name
@@ -36,7 +39,8 @@ class ProductImage(models.Model):
     image = CloudFrontImageField(upload_to="")
     order = models.IntegerField()
     created_on = models.DateTimeField(auto_now_add=True)
-    caption = models.CharField(max_length=200)
+    caption = models.CharField(null=True, blank=True, max_length=200)
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["order"]
@@ -49,6 +53,7 @@ class MenuList(models.Model):
     name = models.CharField(max_length=255)
     created_on = models.DateTimeField(auto_now_add=True)
     meta = models.JSONField(null=True, blank=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.name
@@ -57,9 +62,10 @@ class MenuList(models.Model):
 class MenuListItem(models.Model):
     name = models.CharField(max_length=255)
     menu_list = models.ForeignKey(MenuList, related_name="MenuListItems", on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="")
+    image = CloudFrontImageField(upload_to="")
     url = models.CharField(max_length=255)
     order = models.IntegerField()
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["order"]
@@ -67,6 +73,7 @@ class MenuListItem(models.Model):
 
 class DropDownMenu(models.Model):
     data = models.JSONField(null=True, blank=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return f"BDDW.COM DROPDOWN MENU #{self.id}"

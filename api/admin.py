@@ -23,11 +23,11 @@ class ProductImageInline(admin.TabularInline):
     extra = 1
 
 
-@admin.register(ProductImage)
-class ProductImageAdmin(admin.ModelAdmin):
-    list_display = ("product", "order", "created_on")
-    list_filter = ("product",)
-    search_fields = ("product__name",)
+# @admin.register(ProductImage)
+# class ProductImageAdmin(admin.ModelAdmin):
+#     list_display = ("product", "order", "created_on")
+#     list_filter = ("product",)
+#     search_fields = ("product__name",)
 
 
 class MenuListItemInline(admin.TabularInline):
@@ -42,11 +42,11 @@ class MenuListAdmin(admin.ModelAdmin):
     search_fields = ("name",)
 
 
-@admin.register(MenuListItem)
-class MenuListItemAdmin(admin.ModelAdmin):
-    list_display = ("name", "menu_list", "order", "url")
-    list_filter = ("menu_list",)
-    search_fields = ("name", "menu_list__name")
+# @admin.register(MenuListItem)
+# class MenuListItemAdmin(admin.ModelAdmin):
+#     list_display = ("name", "menu_list", "order", "url")
+#     list_filter = ("menu_list",)
+#     search_fields = ("name", "menu_list__name")
 
 
 # Registering models with inlines
