@@ -7,7 +7,7 @@ import boto3
 
 
 class CloudFrontImageField(models.ImageField):
-    def save(self, *args, **kwargs):
+    def create_invalidation(self):
 
         client = boto3.client(
             'cloudfront',
@@ -26,7 +26,6 @@ class CloudFrontImageField(models.ImageField):
             }
         )
 
-        super().save(*args, **kwargs)
 
 
 
@@ -52,6 +51,11 @@ class ProductImage(models.Model):
     class Meta:
         ordering = ["order"]
 
+    def save(self, *args, **kwargs):
+        self.image.create_invalidation()
+        super().save(*args, **kwargs)
+
+
     def __str__(self):
         return f"Image for {self.product.name} - # {self.order}"
 
@@ -73,6 +77,10 @@ class MenuListItem(models.Model):
     url = models.CharField(max_length=255)
     order = models.IntegerField()
     history = HistoricalRecords()
+
+    def save(self, *args, **kwargs):
+        self.image.create_invalidation()
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["order"]
