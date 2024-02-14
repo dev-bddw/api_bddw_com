@@ -20,7 +20,7 @@ def api_response(request, slug=None):
     serializer_class = None
 
     if slug not in special_cases.keys():
-        slug = slug.lower().replace("-", " ").replace("captains", "captain's")
+        slug = slug.lower().replace("-", " ").replace("captains", "captain's").replace("admirals", "admiral's")
 
     else:
         slug = special_cases[slug]
