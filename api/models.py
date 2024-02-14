@@ -4,9 +4,9 @@ from simple_history.models import HistoricalRecords
 
 import time
 import boto3
+from django.db.models.fields.files import ImageFieldFile
 
-
-class CloudFrontImageField(models.ImageField):
+class CloudFrontImageFieldFile(ImageFieldFile):
     def create_invalidation(self):
 
         client = boto3.client(
@@ -27,6 +27,8 @@ class CloudFrontImageField(models.ImageField):
         )
 
 
+class CloudFrontImageField(models.ImageField):
+    attr_class = CloudFrontImageFieldFile
 
 
 class Product(models.Model):
