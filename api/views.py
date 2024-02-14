@@ -6,11 +6,11 @@ from .models import Product, MenuList, DropDownMenu
 from .serializers import ProductSerializer, MenuListSerializer, DropDownMenuSerializer
 
 special_cases = {
-                 'sev-drulo-series': 'sev-drulo series',
-                 'sev-drulo-sofa': 'sev-drulo sofa',
-                 'sev-drulo-club-chair': 'sev-drulo club chair',
-                 'sev-drulo-sectional-sofa': 'sev-drulo sectional sofa'
-                 }
+    "sev-drulo-series": "sev-drulo series",
+    "sev-drulo-sofa": "sev-drulo sofa",
+    "sev-drulo-club-chair": "sev-drulo club chair",
+    "sev-drulo-sectional-sofa": "sev-drulo sectional sofa",
+}
 
 
 @api_view(["GET", "PUT"])
@@ -20,7 +20,8 @@ def api_response(request, slug=None):
     serializer_class = None
 
     if slug not in special_cases.keys():
-        slug = slug.lower().replace("-", " ")
+        slug = slug.lower().replace("-", " ").replace("captains", "captain's")
+
     else:
         slug = special_cases[slug]
 
@@ -40,7 +41,7 @@ def api_response(request, slug=None):
     # Handle GET request
     if request.method == "GET":
         serializer = serializer_class(instance)
-        body_response = {'body': serializer.data}
+        body_response = {"body": serializer.data}
         return Response(body_response, status=status.HTTP_200_OK)
 
     # Handle PUT request
@@ -115,10 +116,10 @@ def api_create_menulist(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 def api_drop_down_menu(request):
     dropdown_menus = DropDownMenu.objects.all()
     serializer = DropDownMenuSerializer(dropdown_menus.first())
-    body_response = {'body': serializer.data['data']}
+    body_response = {"body": serializer.data["data"]}
     return Response(body_response)
-
