@@ -32,8 +32,8 @@ class CloudFrontImageField(models.ImageField):
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=255)
-    blurb = models.TextField(null=True, blank=True)
+    name = models.CharField(help_text="The name you want to appear in the template", max_length=255)
+    blurb = models.TextField(help_text="The blurb text that appears underneath the carousel", null=True, blank=True)
     meta = models.JSONField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
 
@@ -55,11 +55,13 @@ class Product(models.Model):
 
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE)
-    image = CloudFrontImageField(upload_to="")
-    order = models.IntegerField()
+    product = models.ForeignKey(
+        Product, help_text="image for what product?", related_name="images", on_delete=models.CASCADE
+    )
+    image = CloudFrontImageField(help_text="upload your image here", upload_to="")
+    order = models.IntegerField(help_text="the order the image should appear in the carousel")
     created_on = models.DateTimeField(auto_now_add=True)
-    caption = models.CharField(null=True, blank=True, max_length=200)
+    caption = models.CharField(help_text="image caption", null=True, blank=True, max_length=200)
 
     class Meta:
         ordering = ["order"]
@@ -73,7 +75,7 @@ class ProductImage(models.Model):
 
 
 class MenuList(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(help_text="name appears at the top of the menu template", max_length=255)
     created_on = models.DateTimeField(auto_now_add=True)
     meta = models.JSONField(null=True, blank=True)
 
@@ -92,11 +94,16 @@ class MenuList(models.Model):
 
 
 class MenuListItem(models.Model):
-    name = models.CharField(max_length=255)
-    menu_list = models.ForeignKey(MenuList, related_name="MenuListItems", on_delete=models.CASCADE)
-    image = CloudFrontImageField(upload_to="")
-    url = models.CharField(max_length=255)
-    order = models.IntegerField()
+    name = models.CharField(help_text="name of the menu item", max_length=255)
+    menu_list = models.ForeignKey(
+        MenuList,
+        help_text="menu list this menu item bleongs to",
+        related_name="MenuListItems",
+        on_delete=models.CASCADE,
+    )
+    image = CloudFrontImageField(help_text="'thumbnail' image you want for this menu item", upload_to="")
+    url = models.CharField(help_text="path for linking: /list/list-name or /product/product-name", max_length=255)
+    order = models.IntegerField(help_text="order item to appear")
 
     def save(self, *args, **kwargs):
         self.image.create_invalidation()

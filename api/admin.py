@@ -27,8 +27,8 @@ class ProductImageInline(admin.TabularInline):
 
 
 @admin.register(ProductImage)
-class ProductImageAdmin(admin.ModelAdmin):
-    list_display = ("product", "order", 'image', "created_on")
+class ProductImageAdmin(VersionAdmin):
+    list_display = ("product", "order", "image", "created_on")
     list_filter = ("product",)
     search_fields = ("product__name", "image")
 
@@ -41,12 +41,12 @@ class MenuListItemInline(admin.TabularInline):
 @admin.register(MenuList)
 class MenuListAdmin(VersionAdmin):
     inlines = [MenuListItemInline]
-    list_display = ("name", 'get_absolute_url', 'number_of_list_items', "created_on")
+    list_display = ("name", "get_absolute_url", "number_of_list_items", "created_on")
     search_fields = ("name",)
 
 
 @admin.register(MenuListItem)
-class MenuListItemAdmin(admin.ModelAdmin):
+class MenuListItemAdmin(VersionAdmin):
     list_display = ("name", "menu_list", "order", "image", "url")
     list_filter = ("menu_list",)
     search_fields = ("name", "menu_list__name", "image")
