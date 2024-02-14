@@ -82,7 +82,7 @@ THIRD_PARTY_APPS = [
     'simple_history',
 ]
 
-LOCAL_APPS = ["api_bddw_com.users", "api"]
+LOCAL_APPS = ["api_bddw_com.users", 'api_bddw_com.apps.CoreConfig', "api"]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 

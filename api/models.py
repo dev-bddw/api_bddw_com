@@ -41,6 +41,13 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def slugify(self):
+        return self.name.lower().replace(' ','-')
+
+    def get_absolute_url(self):
+
+        return f'https://bddw.com/product/{self.slugify()}'
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE)
@@ -70,6 +77,14 @@ class MenuList(models.Model):
 
     def __str__(self):
         return self.name
+
+    def slugify(self):
+        return self.name.lower().replace(' ','-')
+
+    def get_absolute_url(self):
+
+        return f'https://bddw.com/list/{self.slugify()}'
+
 
 
 class MenuListItem(models.Model):
