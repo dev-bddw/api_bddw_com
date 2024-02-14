@@ -10,19 +10,21 @@ from django.db.models.fields.files import ImageFieldFile
 class CloudFrontImageFieldFile(ImageFieldFile):
     def create_invalidation(self):
 
-        client = boto3.client(
-            "cloudfront",
-            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-            region_name="us-east-1",  # Specify the appropriate region
-        )
+        if settings.SETTINGS_MODULE == "config.settings.production":
 
-        distribution_id = "EWK3EMFHZGQ8"
-        path = "/" + self.name
-        response = client.create_invalidation(
-            DistributionId=distribution_id,
-            InvalidationBatch={"Paths": {"Quantity": 1, "Items": [path]}, "CallerReference": str(time.time())},
-        )
+            client = boto3.client(
+                "cloudfront",
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                region_name="us-east-1",  # Specify the appropriate region
+            )
+
+            distribution_id = "EWK3EMFHZGQ8"
+            path = "/" + self.name
+            response = client.create_invalidation(
+                DistributionId=distribution_id,
+                InvalidationBatch={"Paths": {"Quantity": 1, "Items": [path]}, "CallerReference": str(time.time())},
+            )
 
 
 class CloudFrontImageField(models.ImageField):
@@ -45,6 +47,12 @@ class Product(models.Model):
 
         return f"https://bddw.com/product/{self.slugify()}"
 
+    def get_blurb_preview(self):
+        return f"{self.blurb[0:100]}..."
+
+    def image_number(self):
+        return len(ProductImage.objects.filter(product__pk=self.id))
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE)
@@ -61,7 +69,7 @@ class ProductImage(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Image for {self.product.name} - # {self.order}"
+        return f"{self.image} - {self.product.name} - # {self.order}"
 
 
 class MenuList(models.Model):
@@ -79,6 +87,9 @@ class MenuList(models.Model):
 
         return f"https://bddw.com/list/{self.slugify()}"
 
+    def number_of_list_items(self):
+        return len(MenuListItem.objects.filter(menu_list_id=self.id))
+
 
 class MenuListItem(models.Model):
     name = models.CharField(max_length=255)
@@ -91,6 +102,9 @@ class MenuListItem(models.Model):
         self.image.create_invalidation()
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return f"Menu List Item: {self.name}"
+
     class Meta:
         ordering = ["order"]
 
@@ -99,4 +113,4 @@ class DropDownMenu(models.Model):
     data = models.JSONField(null=True, blank=True)
 
     def __str__(self):
-        return f"BDDW.COM DROPDOWN MENU #{self.id}"
+        return f"BDDW.COM DROPDOWN MENU {self.id}"
