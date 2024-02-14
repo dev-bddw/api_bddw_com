@@ -1,18 +1,21 @@
 from django.contrib import admin
 from .models import Product, ProductImage, MenuList, MenuListItem, DropDownMenu
 from .forms import DropDownMenuModelForm
+from reversion.admin import VersionAdmin
+
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 10
 
+
 @admin.register(DropDownMenu)
-class DropDownMenuAdmin(admin.ModelAdmin):
+class DropDownMenuAdmin(VersionAdmin):
     form = DropDownMenuModelForm
 
 
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(VersionAdmin):
     inlines = [ProductImageInline]
     list_display = ("name", "created_on")
     search_fields = ("name",)
@@ -36,7 +39,7 @@ class MenuListItemInline(admin.TabularInline):
 
 
 @admin.register(MenuList)
-class MenuListAdmin(admin.ModelAdmin):
+class MenuListAdmin(VersionAdmin):
     inlines = [MenuListItemInline]
     list_display = ("name", "created_on")
     search_fields = ("name",)
