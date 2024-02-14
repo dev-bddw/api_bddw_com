@@ -17,7 +17,7 @@ class CloudFrontImageFieldFile(ImageFieldFile):
         )
 
         distribution_id = 'EWK3EMFHZGQ8'
-        path = '/' + 'woad-sofa.jpeg'
+        path = '/' + self.name
         response = client.create_invalidation(
             DistributionId=distribution_id,
             InvalidationBatch={
