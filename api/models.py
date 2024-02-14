@@ -17,7 +17,7 @@ class CloudFrontImageFieldFile(ImageFieldFile):
         )
 
         distribution_id = 'EWK3EMFHZGQ8'
-        path = '/' + 'woad-sofa.jpeg'
+        path = '/' + self.name
         response = client.create_invalidation(
             DistributionId=distribution_id,
             InvalidationBatch={
@@ -40,6 +40,13 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def slugify(self):
+        return self.name.lower().replace(' ','-')
+
+    def get_absolute_url(self):
+
+        return f'https://bddw.com/product/{self.slugify()}'
 
 
 class ProductImage(models.Model):
@@ -70,6 +77,14 @@ class MenuList(models.Model):
 
     def __str__(self):
         return self.name
+
+    def slugify(self):
+        return self.name.lower().replace(' ','-')
+
+    def get_absolute_url(self):
+
+        return f'https://bddw.com/list/{self.slugify()}'
+
 
 
 class MenuListItem(models.Model):
