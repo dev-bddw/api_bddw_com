@@ -6,24 +6,22 @@ import time
 import boto3
 from django.db.models.fields.files import ImageFieldFile
 
+
 class CloudFrontImageFieldFile(ImageFieldFile):
     def create_invalidation(self):
 
         client = boto3.client(
-            'cloudfront',
+            "cloudfront",
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-            region_name='us-east-1'  # Specify the appropriate region
+            region_name="us-east-1",  # Specify the appropriate region
         )
 
-        distribution_id = 'EWK3EMFHZGQ8'
-        path = '/' + self.name
+        distribution_id = "EWK3EMFHZGQ8"
+        path = "/" + self.name
         response = client.create_invalidation(
             DistributionId=distribution_id,
-            InvalidationBatch={
-                'Paths': {'Quantity': 1, 'Items': [path]},
-                'CallerReference': str(time.time())
-            }
+            InvalidationBatch={"Paths": {"Quantity": 1, "Items": [path]}, "CallerReference": str(time.time())},
         )
 
 
@@ -36,17 +34,16 @@ class Product(models.Model):
     blurb = models.TextField(null=True, blank=True)
     meta = models.JSONField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
-    history = HistoricalRecords()
 
     def __str__(self):
         return self.name
 
     def slugify(self):
-        return self.name.lower().replace(' ','-')
+        return self.name.lower().replace(" ", "-")
 
     def get_absolute_url(self):
 
-        return f'https://bddw.com/product/{self.slugify()}'
+        return f"https://bddw.com/product/{self.slugify()}"
 
 
 class ProductImage(models.Model):
@@ -55,7 +52,6 @@ class ProductImage(models.Model):
     order = models.IntegerField()
     created_on = models.DateTimeField(auto_now_add=True)
     caption = models.CharField(null=True, blank=True, max_length=200)
-    history = HistoricalRecords()
 
     class Meta:
         ordering = ["order"]
@@ -63,7 +59,6 @@ class ProductImage(models.Model):
     def save(self, *args, **kwargs):
         self.image.create_invalidation()
         super().save(*args, **kwargs)
-
 
     def __str__(self):
         return f"Image for {self.product.name} - # {self.order}"
@@ -73,18 +68,16 @@ class MenuList(models.Model):
     name = models.CharField(max_length=255)
     created_on = models.DateTimeField(auto_now_add=True)
     meta = models.JSONField(null=True, blank=True)
-    history = HistoricalRecords()
 
     def __str__(self):
         return self.name
 
     def slugify(self):
-        return self.name.lower().replace(' ','-')
+        return self.name.lower().replace(" ", "-")
 
     def get_absolute_url(self):
 
-        return f'https://bddw.com/list/{self.slugify()}'
-
+        return f"https://bddw.com/list/{self.slugify()}"
 
 
 class MenuListItem(models.Model):
@@ -93,7 +86,6 @@ class MenuListItem(models.Model):
     image = CloudFrontImageField(upload_to="")
     url = models.CharField(max_length=255)
     order = models.IntegerField()
-    history = HistoricalRecords()
 
     def save(self, *args, **kwargs):
         self.image.create_invalidation()
@@ -105,7 +97,6 @@ class MenuListItem(models.Model):
 
 class DropDownMenu(models.Model):
     data = models.JSONField(null=True, blank=True)
-    history = HistoricalRecords()
 
     def __str__(self):
         return f"BDDW.COM DROPDOWN MENU #{self.id}"

@@ -79,10 +79,11 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "drf_spectacular",
-    'simple_history',
+    "simple_history",
+    "reversion",
 ]
 
-LOCAL_APPS = ["api_bddw_com.users", 'api_bddw_com.apps.CoreConfig', "api"]
+LOCAL_APPS = ["api_bddw_com.users", "api_bddw_com.apps.CoreConfig", "api"]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -137,7 +138,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
-    'simple_history.middleware.HistoryRequestMiddleware',
+    "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
 # STATIC
@@ -305,4 +306,4 @@ SPECTACULAR_SETTINGS = {
 # Your stuff...
 # ------------------------------------------------------------------------------
 
-DJANGO_SETTINGS_MODULE = env('DJANGO_SETTINGS_MODULE', default="config.settings.local")
+DJANGO_SETTINGS_MODULE = env("DJANGO_SETTINGS_MODULE", default="config.settings.local")
