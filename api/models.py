@@ -5,7 +5,19 @@ from simple_history.models import HistoricalRecords
 import time
 import boto3
 from django.db.models.fields.files import ImageFieldFile
+import os
+from django.utils.deconstruct import deconstructible
 
+@deconstructible
+class LowercaseRename(object):
+    def __init__(self, path):
+        self.path = path
+
+    def __call__(self, instance, filename):
+        # Lowercase the entire filename including the extension
+        filename = filename.lower()
+        # Return the new path with the lowercased filename
+        return os.path.join(self.path, filename)
 
 class CloudFrontImageFieldFile(ImageFieldFile):
     def create_invalidation(self):
@@ -58,7 +70,7 @@ class ProductImage(models.Model):
     product = models.ForeignKey(
         Product, help_text="image for what product?", related_name="images", on_delete=models.CASCADE
     )
-    image = CloudFrontImageField(help_text="upload your image here", upload_to="")
+    image = CloudFrontImageField(help_text="upload your image here", upload_to=LowercaseRename(""))
     order = models.IntegerField(help_text="the order the image should appear in the carousel")
     created_on = models.DateTimeField(auto_now_add=True)
     caption = models.CharField(help_text="image caption", null=True, blank=True, max_length=200)
@@ -101,7 +113,7 @@ class MenuListItem(models.Model):
         related_name="MenuListItems",
         on_delete=models.CASCADE,
     )
-    image = CloudFrontImageField(help_text="'thumbnail' image you want for this menu item", upload_to="")
+    image = CloudFrontImageField(help_text="'thumbnail' image you want for this menu item", upload_to=LowercaseRename(""))
     url = models.CharField(help_text="path for linking: /list/list-name or /product/product-name", max_length=255)
     order = models.IntegerField(help_text="order item to appear")
 
