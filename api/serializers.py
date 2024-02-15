@@ -7,7 +7,8 @@ from .models import DropDownMenu
 class DropDownMenuSerializer(serializers.ModelSerializer):
     class Meta:
         model = DropDownMenu
-        fields = '__all__'
+        fields = "__all__"
+
 
 class ImageNameField(serializers.ImageField):
     def to_representation(self, value):
@@ -20,7 +21,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductImage
-        fields = ["image", "order"]
+        fields = ["image", "order", "caption"]
 
 
 class ProductSerializer(serializers.ModelSerializer):

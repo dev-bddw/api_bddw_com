@@ -8,6 +8,7 @@ from django.db.models.fields.files import ImageFieldFile
 import os
 from django.utils.deconstruct import deconstructible
 
+
 @deconstructible
 class LowercaseRename(object):
     def __init__(self, path):
@@ -18,6 +19,7 @@ class LowercaseRename(object):
         filename = filename.lower()
         # Return the new path with the lowercased filename
         return os.path.join(self.path, filename)
+
 
 class CloudFrontImageFieldFile(ImageFieldFile):
     def create_invalidation(self):
@@ -113,7 +115,9 @@ class MenuListItem(models.Model):
         related_name="MenuListItems",
         on_delete=models.CASCADE,
     )
-    image = CloudFrontImageField(help_text="'thumbnail' image you want for this menu item", upload_to=LowercaseRename(""))
+    image = CloudFrontImageField(
+        help_text="'thumbnail' image you want for this menu item", upload_to=LowercaseRename("")
+    )
     url = models.CharField(help_text="path for linking: /list/list-name or /product/product-name", max_length=255)
     order = models.IntegerField(help_text="order item to appear")
 
