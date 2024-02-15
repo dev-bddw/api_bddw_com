@@ -16,7 +16,7 @@ class ProductImageInline(admin.TabularInline):
     readonly_fields = ['image_thumbnail']  # Ensure image_thumbnail is treated as a read-only field,
 
     def image_thumbnail(self, obj):
-        return format_html('<img src="{}" width="75" height="75" />', obj.image.url)
+        return format_html('<img src="{}" width="75" />', obj.image.url)
 
 
 @admin.register(Product)
@@ -34,7 +34,7 @@ class ProductImageAdmin(VersionAdmin):
     readonly_fields = ['image_thumbnail']  # Ensure image_thumbnail is treated as a read-only field
 
     def image_thumbnail(self, obj):
-        return format_html('<img src="{}" width="75" height="75" />', obj.image.url)
+        return format_html('<img src="{}" width="75"  />', obj.image.url)
 
 
 
@@ -46,7 +46,7 @@ class MenuListItemInline(admin.TabularInline):
     readonly_fields = ['image_thumbnail']  # Ensure image_thumbnail is treated as a read-only field
 
     def image_thumbnail(self, obj):
-        return format_html('<img src="{}" width="75" height="75" />', obj.image.url)
+        return format_html('<img src="{}" width="75" />', obj.image.url)
 
 
 
@@ -66,7 +66,7 @@ class MenuListItemAdmin(VersionAdmin):
     readonly_fields = ['image_thumbnail']  # Ensure image_thumbnail is treated as a read-only field
 
     def image_thumbnail(self, obj):
-        return format_html('<img src="{}" width="75" height="75" />', obj.image.url)
+        return format_html('<img src="{}" width="75" />', obj.image.url)
 
 
 
