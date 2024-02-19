@@ -88,6 +88,7 @@ class ProductImage(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+        self.image.create_invalidation()
         if self.image and not self.thumbnail:
             img = Image.open(self.image)
             img.thumbnail((300, 300))
@@ -100,7 +101,7 @@ class ProductImage(models.Model):
             thumb_file = ContentFile(thumb_io.getvalue(), file_name)
 
             self.thumbnail.save(file_name, thumb_file)
-
+            self.thumbnail.create_invalidation()
             super().save(*args, **kwargs)
 
     def __str__(self):
