@@ -1,6 +1,9 @@
 from django.db import models
 from django.conf import settings
 from simple_history.models import HistoricalRecords
+from PIL import Image
+from django.core.files.base import ContentFile
+from io import BytesIO
 
 import time
 import boto3
@@ -73,6 +76,9 @@ class ProductImage(models.Model):
         Product, help_text="image for what product?", related_name="images", on_delete=models.CASCADE
     )
     image = CloudFrontImageField(help_text="upload your image here", upload_to=LowercaseRename(""))
+    thumbnail = CloudFrontImageField(
+        default=None, blank=True, null=True, help_text="thumbnail of image", upload_to=LowercaseRename("")
+    )
     order = models.IntegerField(help_text="the order the image should appear in the carousel")
     created_on = models.DateTimeField(auto_now_add=True)
     caption = models.CharField(help_text="image caption", null=True, blank=True, max_length=200)
@@ -81,8 +87,21 @@ class ProductImage(models.Model):
         ordering = ["order"]
 
     def save(self, *args, **kwargs):
-        self.image.create_invalidation()
         super().save(*args, **kwargs)
+        if self.image and not self.thumbnail:
+            img = Image.open(self.image)
+            img.thumbnail((300, 300))
+            thumb_io = BytesIO()
+            img.save(thumb_io, img.format)
+
+            file_name = self.image.name
+            root, ext = os.path.splitext(file_name)
+            file_name = f"{root}-thumb{ext}"
+            thumb_file = ContentFile(thumb_io.getvalue(), file_name)
+
+            self.thumbnail.save(file_name, thumb_file)
+
+            super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.image} - {self.product.name} - # {self.order}"
