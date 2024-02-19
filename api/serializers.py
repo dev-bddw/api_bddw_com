@@ -18,6 +18,7 @@ class ImageNameField(serializers.ImageField):
 class ProductImageSerializer(serializers.ModelSerializer):
 
     image = ImageNameField()
+    thumbnail = ImageNameField()
 
     class Meta:
         model = ProductImage
