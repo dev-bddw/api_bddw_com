@@ -2,8 +2,8 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Product, MenuList, DropDownMenu
-from .serializers import ProductSerializer, MenuListSerializer, DropDownMenuSerializer
+from .models import Product, MenuList, DropDownMenu, LandingPageImage
+from .serializers import ProductSerializer, MenuListSerializer, DropDownMenuSerializer, LandingPageImageSerializer
 
 special_cases = {
     "sev-drulo-series": "sev-drulo series",
@@ -124,4 +124,12 @@ def api_drop_down_menu(request):
     dropdown_menus = DropDownMenu.objects.all()
     serializer = DropDownMenuSerializer(dropdown_menus.first())
     body_response = {"body": serializer.data["data"]}
+    return Response(body_response)
+
+
+@api_view(["GET"])
+def api_landing_page_images(request):
+    landing_page_images = LandingPageImage.objects.all()
+    serializer = LandingPageImageSerializer(landing_page_images, many=True)
+    body_response = {"body": serializer.data}
     return Response(body_response)

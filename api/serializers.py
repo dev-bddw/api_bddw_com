@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Product, ProductImage
 from .models import MenuList, MenuListItem
+from .models import LandingPageImage
 from .models import DropDownMenu
 
 
@@ -13,6 +14,15 @@ class DropDownMenuSerializer(serializers.ModelSerializer):
 class ImageNameField(serializers.ImageField):
     def to_representation(self, value):
         return value.name if value else None
+
+
+class LandingPageImageSerializer(serializers.ModelSerializer):
+    image = ImageNameField()
+    thumbnail = ImageNameField()
+
+    class Meta:
+        model = LandingPageImage
+        fields = ["image", "thumbnail"]
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
