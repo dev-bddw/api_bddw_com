@@ -97,7 +97,7 @@ class MenuListItemAdmin(VersionAdmin):
     list_display = ("name", "menu_list", "order", "image", "url")
     list_filter = ("menu_list",)
     search_fields = ("name", "menu_list__name", "image")
-    fields = ["name", "image_thumbnail", "url", "order"]
+    fields = ["name", "menu_list", "image_thumbnail", "url", "order"]
     readonly_fields = ["image_thumbnail"]  # Ensure image_thumbnail is treated as a read-only field
 
     def image_thumbnail(self, obj):
