@@ -1,5 +1,6 @@
 from .base import *  # noqa
 from .base import env
+import sentry_sdk
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -192,4 +193,17 @@ SPECTACULAR_SETTINGS["SERVERS"] = [  # noqa: F405
 ]
 # Your stuff...
 # ------------------------------------------------------------------------------
-CLOUDFLARE_DISTRIBUTION_ID = env('CLOUDFLARE_DISTRIBUTION_ID', None)
+CLOUDFLARE_DISTRIBUTION_ID = env("CLOUDFLARE_DISTRIBUTION_ID", None)
+SENTRY_ENV_DSN = env("DJANGO_SENTRY_ENV_DSN", None)
+
+if SENTRY_ENV_DSN:
+    sentry_sdk.init(
+        dsn=f"{SENTRY_ENV_DSN}",
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        traces_sample_rate=1.0,
+        # Set profiles_sample_rate to 1.0 to profile 100%
+        # of sampled transactions.
+        # We recommend adjusting this value in production.
+        profiles_sample_rate=1.0,
+    )
