@@ -36,7 +36,7 @@ class CloudFrontImageFieldFile(ImageFieldFile):
                 region_name="us-east-1",  # Specify the appropriate region
             )
 
-            distribution_id = "EWK3EMFHZGQ8"
+            distribution_id = settings.CLOUDFLARE_DISTRIBUTION_ID
             path = "/" + self.name
             response = client.create_invalidation(
                 DistributionId=distribution_id,
@@ -89,20 +89,19 @@ class ProductImage(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         self.image.create_invalidation()
-        if self.image and not self.thumbnail:
-            img = Image.open(self.image)
-            img.thumbnail((300, 300))
-            thumb_io = BytesIO()
-            img.save(thumb_io, img.format)
+        img = Image.open(self.image)
+        img.thumbnail((300, 300))
+        thumb_io = BytesIO()
+        img.save(thumb_io, img.format)
 
-            file_name = self.image.name
-            root, ext = os.path.splitext(file_name)
-            file_name = f"{root}-thumb{ext}"
-            thumb_file = ContentFile(thumb_io.getvalue(), file_name)
+        file_name = self.image.name
+        root, ext = os.path.splitext(file_name)
+        file_name = f"{root}-thumb{ext}"
+        thumb_file = ContentFile(thumb_io.getvalue(), file_name)
 
-            self.thumbnail.save(file_name, thumb_file)
-            self.thumbnail.create_invalidation()
-            super().save(*args, **kwargs)
+        self.thumbnail.save(file_name, thumb_file)
+        self.thumbnail.create_invalidation()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.image} - {self.product.name} - # {self.order}"
