@@ -87,7 +87,7 @@ class ProductImage(models.Model):
         ordering = ["order"]
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+        # super().save(*args, **kwargs)
         self.image.create_invalidation()
         img = Image.open(self.image)
         img.thumbnail((300, 300))
