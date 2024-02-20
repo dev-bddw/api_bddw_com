@@ -157,7 +157,7 @@ class MenuListItem(models.Model):
     name = models.CharField(help_text="name of the menu item", max_length=255)
     menu_list = models.ForeignKey(
         MenuList,
-        help_text="menu list this menu item bleongs to",
+        help_text="menu list where this item appears",
         related_name="MenuListItems",
         on_delete=models.CASCADE,
     )
