@@ -12,13 +12,22 @@ class DropDownMenuAdmin(VersionAdmin):
 
 @admin.register(LandingPageImage)
 class LandingPageImageAdmin(VersionAdmin):
-    list_display = ["thumbnail_display", "dimensions", "image_name"]
+    list_display = ["thumbnail_list_display", "dimensions", "image_name"]
+    fields = [
+        "image_display",
+        "image",
+    ]
+
+    readonly_fields = ["image_display"]  # Ensure image_thumbnail is treated as a read-only field,
+
+    def image_display(self, obj):
+        return format_html('<img src="{}" width="1500" />', obj.image.url)
 
     def dimensions(self, obj):
         width, height = obj.image.width, obj.image.height
         return format_html("<p>{} x {}</p>", width, height)
 
-    def thumbnail_display(self, obj):
+    def thumbnail_list_display(self, obj):
         return format_html('<img src="{}" width="75" />', obj.thumbnail.url)
 
     def image_name(self, obj):

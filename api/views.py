@@ -129,7 +129,7 @@ def api_drop_down_menu(request):
 
 @api_view(["GET"])
 def api_landing_page_images(request):
-    landing_page_images = LandingPageImage.objects.all()
-    serializer = LandingPageImageSerializer(landing_page_images, many=True)
+    landing_page_image = LandingPageImage.objects.all().order_by("?").first()
+    serializer = LandingPageImageSerializer(landing_page_image)
     body_response = {"body": serializer.data}
     return Response(body_response)

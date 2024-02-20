@@ -1,4 +1,13 @@
 {
-    "venvPath": "/Users/lance-rlf/.pyenv/versions/",
-    "venv": ".apivenv"
+  "include": [
+    "/Users/lance-rlf/dev/django-projects/api_bddw_com/"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__"
+  ],
+  "venvPath": "/Users/lance-rlf/.pyenv/versions/",
+  "venv": ".apivenv",
+  "reportMissingImports": true,
+  "typeCheckingMode": "off" // or "basic", depending on your preference
 }
