@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, ProductImage, MenuList, MenuListItem, DropDownMenu
+from .models import Product, ProductImage, MenuList, MenuListItem, DropDownMenu, LandingPageImage
 from .forms import DropDownMenuModelForm
 from reversion.admin import VersionAdmin
 from django.utils.html import format_html
@@ -8,6 +8,21 @@ from django.utils.html import format_html
 @admin.register(DropDownMenu)
 class DropDownMenuAdmin(VersionAdmin):
     form = DropDownMenuModelForm
+
+
+@admin.register(LandingPageImage)
+class LandingPageImageAdmin(VersionAdmin):
+    list_display = ["thumbnail_display", "dimensions", "image_name"]
+
+    def dimensions(self, obj):
+        width, height = obj.image.width, obj.image.height
+        return format_html("<p>{} x {}</p>", width, height)
+
+    def thumbnail_display(self, obj):
+        return format_html('<img src="{}" width="75" />', obj.thumbnail.url)
+
+    def image_name(self, obj):
+        return obj.image.name
 
 
 class ProductImageInline(admin.TabularInline):
@@ -28,14 +43,21 @@ class ProductAdmin(VersionAdmin):
 
 @admin.register(ProductImage)
 class ProductImageAdmin(VersionAdmin):
-    list_display = ("product", "order", "image", "created_on")
+    list_display = ("image_thumbnail_list", "product", "order", "image", "created_on", "dimensions")
     list_filter = ("product",)
     search_fields = ("product__name", "image")
     fields = ["image_thumbnail", "image", "product", "order", "caption"]
     readonly_fields = ["image_thumbnail"]  # Ensure image_thumbnail is treated as a read-only field
 
+    def image_thumbnail_list(self, obj):
+        return format_html('<img src="{}" height="40"  />', obj.thumbnail.url)
+
     def image_thumbnail(self, obj):
         return format_html('<img src="{}" width="300"  />', obj.thumbnail.url)
+
+    def dimensions(self, obj):
+        width, height = obj.image.width, obj.image.height
+        return format_html("<p>{} x {}</p>", width, height)
 
 
 class MenuListItemInline(admin.TabularInline):
