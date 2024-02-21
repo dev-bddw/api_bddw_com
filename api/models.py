@@ -1,15 +1,14 @@
-from django.db import models
-from django.conf import settings
-from simple_history.models import HistoricalRecords
-from PIL import Image
-from django.core.files.base import ContentFile
+import os
+import time
 from io import BytesIO
 
-import time
 import boto3
+from django.conf import settings
+from django.core.files.base import ContentFile
+from django.db import models
 from django.db.models.fields.files import ImageFieldFile
-import os
 from django.utils.deconstruct import deconstructible
+from PIL import Image
 
 
 @deconstructible
@@ -17,7 +16,7 @@ class LowercaseRename(object):
     def __init__(self, path):
         self.path = path
 
-    def __call__(self, instance, filename):
+    def __call__(self, instance, filename):  # type: ignore
         # Lowercase the entire filename including the extension
         filename = filename.lower()
         # Return the new path with the lowercased filename
@@ -38,7 +37,7 @@ class CloudFrontImageFieldFile(ImageFieldFile):
 
             distribution_id = settings.CLOUDFLARE_DISTRIBUTION_ID
             path = "/" + self.name
-            response = client.create_invalidation(
+            client.create_invalidation(
                 DistributionId=distribution_id,
                 InvalidationBatch={"Paths": {"Quantity": 1, "Items": [path]}, "CallerReference": str(time.time())},
             )
@@ -106,9 +105,9 @@ class ProductImage(models.Model):
 
 
 class LandingPageImage(models.Model):
-    image = CloudFrontImageField(help_text="upload your image here", upload_to=LowercaseRename(""))
-    thumbnail = CloudFrontImageField(
-        default=None, blank=True, null=True, help_text="thumbnail of image", upload_to=LowercaseRename("")
+    image = CloudFrontImageField(help_text="upload your image here", upload_to=LowercaseRename(""))  # type: ignore
+    thumbnail = (
+        CloudFrontImageField()  # type: ignore  default=None, blank=True, null=True, help_text="thumbnail of image", upload_to=LowercaseRename("")
     )
     created_on = models.DateTimeField(auto_now_add=True)
 

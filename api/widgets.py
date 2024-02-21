@@ -1,6 +1,8 @@
+import subprocess
+
 from django.forms.widgets import Widget
 from django.utils.safestring import mark_safe
-import subprocess
+
 
 def pretify(data):
     json_str = data

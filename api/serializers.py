@@ -1,8 +1,6 @@
 from rest_framework import serializers
-from .models import Product, ProductImage
-from .models import MenuList, MenuListItem
-from .models import LandingPageImage
-from .models import DropDownMenu
+
+from .models import DropDownMenu, LandingPageImage, MenuList, MenuListItem, Product, ProductImage
 
 
 class DropDownMenuSerializer(serializers.ModelSerializer):

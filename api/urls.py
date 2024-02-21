@@ -1,6 +1,6 @@
-from django.urls import include, path
+from django.urls import path
 
-from .views import api_response, api_create_product, api_create_menulist, api_drop_down_menu, api_landing_page_images
+from .views import api_create_menulist, api_create_product, api_drop_down_menu, api_landing_page_images, api_response
 
 app_name = "api"
 

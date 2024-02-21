@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import Product, ProductImage, MenuList, MenuListItem, DropDownMenu, LandingPageImage
-from .forms import DropDownMenuModelForm
-from reversion.admin import VersionAdmin
 from django.utils.html import format_html
+from reversion.admin import VersionAdmin
+
+from .forms import DropDownMenuModelForm
+from .models import DropDownMenu, LandingPageImage, MenuList, MenuListItem, Product, ProductImage
 
 
 @admin.register(DropDownMenu)

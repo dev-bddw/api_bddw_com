@@ -1,13 +1,13 @@
-from django.urls import reverse
-from django.contrib.auth import get_user_model
-
-from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
-from api.models import Product, MenuList
-
-from rest_framework.authtoken.models import Token
 import tempfile
+
+from django.contrib.auth import get_user_model
+from django.urls import reverse
 from PIL import Image
+from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APIClient, APITestCase
+
+from api.models import MenuList, Product
 
 User = get_user_model()
 
@@ -74,9 +74,10 @@ class CreatProductTestCase(APITestCase):
         self.assertEqual(Product.objects.first().images.count(), 2)
 
     def create_image_file(self):
-        from PIL import Image
         from io import BytesIO
+
         from django.core.files.base import File
+        from PIL import Image
 
         image = Image.new("RGB", (100, 100))
         tmp_file = BytesIO()

@@ -1,9 +1,10 @@
-from rest_framework.decorators import api_view, parser_classes
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.response import Response
 from rest_framework import status
-from .models import Product, MenuList, DropDownMenu, LandingPageImage
-from .serializers import ProductSerializer, MenuListSerializer, DropDownMenuSerializer, LandingPageImageSerializer
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.response import Response
+
+from .models import DropDownMenu, LandingPageImage, MenuList, Product
+from .serializers import DropDownMenuSerializer, LandingPageImageSerializer, MenuListSerializer, ProductSerializer
 
 special_cases = {
     "sev-drulo-series": "sev-drulo series",
