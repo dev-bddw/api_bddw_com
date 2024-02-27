@@ -26,7 +26,7 @@ class LowercaseRename(object):
 class CloudFrontImageFieldFile(ImageFieldFile):
     def create_invalidation(self):
 
-        if settings.SETTINGS_MODULE == "config.settings.production":
+        if settings.SETTINGS_MODULE in ["config.settings.production", 'config.settings.staging']:
 
             client = boto3.client(
                 "cloudfront",
