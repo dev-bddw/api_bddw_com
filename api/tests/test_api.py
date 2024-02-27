@@ -1,86 +1,132 @@
-import tempfile
+import requests
+import environ
+import unittest
 
-from django.contrib.auth import get_user_model
-from django.urls import reverse
-from PIL import Image
-from rest_framework import status
-from rest_framework.authtoken.models import Token
-from rest_framework.test import APIClient, APITestCase
-
-from api.models import MenuList, Product
-
-User = get_user_model()
+import logging
 
 
-class ProductMenuListTestCase(APITestCase):
+class TraverseMenuLinksTestCase(unittest.TestCase):
+
     def setUp(self):
+
         # Set up data for testing
-        self.client = APIClient()
-
-        self.user = User.objects.create_user(email="testuser@bddw.com", password="12345")
-        self.token = Token.objects.create(user=self.user)
-
-        self.product = Product.objects.create(name="Test Product", blurb="Test Blurb")
-        self.menulist = MenuList.objects.create(name="Test MenuList")
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-
-    def test_get_product(self):
-        # Test retrieving a product
-        response = self.client.get(
-            reverse("api:api-endpoint", kwargs={"slug": self.product.name.lower().replace(" ", "-")})
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["name"], self.product.name)
-
-    def test_get_menulist(self):
-        # Test retrieving a menulist
-        response = self.client.get(
-            reverse("api:api-endpoint", kwargs={"slug": self.menulist.name.lower().replace(" ", "-")})
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["name"], self.menulist.name)
-
-    def test_get_not_found(self):
-        # Test retrieving a non-existent object
-        response = self.client.get(reverse("api:api-endpoint", kwargs={"slug": "nonexistent"}))
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-
-class CreatProductTestCase(APITestCase):
-    def setUp(self):
-        # Set up data for testing
-        self.client = APIClient()
-
-        self.user = User.objects.create_user(email="testuser@bddw.com", password="12345")
-        self.token = Token.objects.create(user=self.user)
-
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-
-    def test_create_product_with_images(self):
-        url = reverse("api:create-product")  # Update with your actual URL name
-        data = {
-            "name": "Test Product",
-            "blurb": "Test Blurb",
-            "meta": "{}",
-            "images": [
-                {"image": self.create_image_file(), "order": 1},
-                {"image": self.create_image_file(), "order": 2},
-            ],
+        self.env = environ.Env()
+        self.token = self.env('API_AUTH_TOKEN', None)
+        self.api_url = self.env('API_URL', None)
+        self.headers = {
+            'Authorization': 'Token ' + self.token,
+            'Content-Type': 'application/json'
         }
 
-        response = self.client.post(url, data, format="multipart")
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Product.objects.count(), 1)
-        self.assertEqual(Product.objects.first().images.count(), 2)
+        logging.basicConfig(level=logging.INFO) # Sets the level to show INFO messages
 
-    def create_image_file(self):
-        from io import BytesIO
+    def test_env(self):
 
-        from django.core.files.base import File
-        from PIL import Image
+        self.assertIsNotNone(self.token)
+        self.assertIsNotNone(self.api_url)
 
-        image = Image.new("RGB", (100, 100))
-        tmp_file = BytesIO()
-        image.save(tmp_file, "JPEG")
-        tmp_file.seek(0)
-        return File(tmp_file, name="test.jpg")
+    def test_catalog_response(self):
+
+        response = requests.get(f'{self.api_url}/catalog', headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+
+    def test_catalog_menu_lists(self):
+
+        self.traverse_from_starting_point('/catalog')
+
+    def convert_url(self, path : str) -> str:
+
+        #logging.info(f'Converting for {path}')
+        items_list = path.split('/')
+        items_list = [x for x in items_list if x not in ['list', 'product', '', '/']]
+        #logging.info(f'Converted {path} to {items_list[0]}')
+
+        return  '/' + items_list[0]
+
+    def traverse_from_starting_point(self, endpoint_path: str) -> None:
+        logging.info(f'Attempting to reach {self.api_url + endpoint_path}')
+
+        response = requests.get(self.api_url + endpoint_path, headers=self.headers)
+        response_body: dict = response.json()
+
+        if response.status_code == 404:
+            raise ValueError(f'A problem with endpoint: {endpoint_path}, it returned error 404')
+
+        body = response_body.get('body')
+        is_product = 'images' in body.keys()
+
+        if is_product:
+            logging.info(f'This endpoint ({self.api_url + endpoint_path}) returns a product record for {body.get('name', None)}')
+            return
+
+        for record in body.get('records', []):
+            endpoint_path = self.convert_url(record.get('url', None))
+
+            if 'https' not in endpoint_path:
+                self.traverse_from_starting_point(endpoint_path)
+
+
+class TraverseDropDownLinksTestCase(unittest.TestCase):
+
+    def setUp(self):
+
+        # Set up data for testing
+        self.env = environ.Env()
+        self.token = self.env('API_AUTH_TOKEN', None)
+        self.api_url = self.env('API_URL', None)
+        self.site_url = self.env('SITE_URL', None)
+        self.headers = {
+            'Authorization': 'Token ' + self.token,
+            'Content-Type': 'application/json'
+        }
+
+        logging.basicConfig(level=logging.INFO) # Sets the level to show INFO messages
+
+    def test_drop_down_response(self):
+
+        response = requests.get(f'https://api.bddw.com/api/drop-down-menu', headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+
+    def test_drop_down_menu_links(self):
+
+        response = requests.get(f'https://api.bddw.com/api/drop-down-menu', headers=self.headers)
+        response_body : dict = response.json()
+        records : list = response_body['body']
+
+        self.traverse_drop_down_menu(records)
+
+    def traverse_drop_down_menu(self, records :list ):
+
+        for record in records:
+
+            record_url = record.get('url')
+            logging.info(f'Testing record {record.get('name')} at {record_url}')
+
+            if record_url.startswith('http'): ## dont bother
+                return
+
+            response = requests.get(f'{self.site_url}{record_url}', headers=self.headers)
+
+            if response.status_code == 404:
+                raise ValueError(f'Issue with drop down menu record, {record.get('name', 'Undefined record')}')
+
+            else:
+
+                if record.get('children', []) != []:
+                    for child in record.get('children'):
+                        self.traverse_drop_down_menu(child)
+
+
+# {
+#     "body": [
+#         {
+#             "url": "/list/upholstery/",
+#             "name": "UPHOLSTERY",
+#             "order": 10,
+#             "children": [
+#                 [
+#                     {
+#                         "url": "/list/sofas-collection",
+#                         "name": "sofas",
+#                         "order": "1",
+#                         "children": []

@@ -52,6 +52,7 @@ class Product(models.Model):
     blurb = models.TextField(help_text="The blurb text that appears underneath the carousel", null=True, blank=True)
     meta = models.JSONField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -81,6 +82,7 @@ class ProductImage(models.Model):
     order = models.IntegerField(help_text="the order the image should appear in the carousel")
     created_on = models.DateTimeField(auto_now_add=True)
     caption = models.CharField(help_text="image caption", null=True, blank=True, max_length=200)
+    updated_on = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["order"]
@@ -107,9 +109,10 @@ class ProductImage(models.Model):
 class LandingPageImage(models.Model):
     image = CloudFrontImageField(help_text="upload your image here", upload_to=LowercaseRename(""))  # type: ignore
     thumbnail = (
-        CloudFrontImageField()  # type: ignore  default=None, blank=True, null=True, help_text="thumbnail of image", upload_to=LowercaseRename("")
+        CloudFrontImageField(default=None, blank=True, null=True, help_text="thumbnail of image", upload_to=LowercaseRename(""))
     )
     created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["created_on"]
@@ -137,6 +140,7 @@ class MenuList(models.Model):
     name = models.CharField(help_text="name appears at the top of the menu template", max_length=255)
     created_on = models.DateTimeField(auto_now_add=True)
     meta = models.JSONField(null=True, blank=True)
+    updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -165,6 +169,7 @@ class MenuListItem(models.Model):
     )
     url = models.CharField(help_text="path for linking: /list/list-name or /product/product-name", max_length=255)
     order = models.IntegerField(help_text="order item to appear")
+    updated_on = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         self.image.create_invalidation()
@@ -179,6 +184,7 @@ class MenuListItem(models.Model):
 
 class DropDownMenu(models.Model):
     data = models.JSONField(null=True, blank=True)
+    updated_on = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"BDDW.COM DROPDOWN MENU {self.id}"

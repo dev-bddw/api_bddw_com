@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from .models import DropDownMenu, LandingPageImage, MenuList, Product
 from .serializers import DropDownMenuSerializer, LandingPageImageSerializer, MenuListSerializer, ProductSerializer
-
+####
 special_cases = {
     "sev-drulo-series": "sev-drulo series",
     "sev-drulo-sofa": "sev-drulo sofa",
