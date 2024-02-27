@@ -3,43 +3,43 @@ version: '3'
 volumes:
   production_postgres_data: {}
   production_postgres_data_backups: {}
-  production_traefik: {}
+  staging_traefik: {}
 
 services:
   django:
     build:
       context: .
-      dockerfile: ./compose/production/django/Dockerfile
+      dockerfile: ./compose/staging/django/Dockerfile
 
-    image: api_bddw_com_production_django
+    image: api_bddw_com_staging_django
     depends_on:
       - postgres
       - redis
     env_file:
-      - ./.envs/.production/.django
-      - ./.envs/.production/.postgres
+      - ./.envs/.staging/.django
+      - ./.envs/.staging/.postgres
     command: /start
 
   postgres:
     build:
       context: .
-      dockerfile: ./compose/production/postgres/Dockerfile
-    image: api_bddw_com_production_postgres
+      dockerfile: ./compose/staging/postgres/Dockerfile
+    image: api_bddw_com_staging_postgres
     volumes:
-      - production_postgres_data:/var/lib/postgresql/data
+      - production_postgres_data:/var/lib/postgresql/data # we want to use the extant production db that's on the server for our staging site
       - production_postgres_data_backups:/backups
     env_file:
-      - ./.envs/.production/.postgres
+      - ./.envs/.staging/.postgres
 
   traefik:
     build:
       context: .
-      dockerfile: ./compose/production/traefik/Dockerfile
-    image: api_bddw_com_production_traefik
+      dockerfile: ./compose/staging/traefik/Dockerfile
+    image: api_bddw_com_staging_traefik
     depends_on:
       - django
     volumes:
-      - production_traefik:/etc/traefik/acme
+      - staging_traefik:/etc/traefik/acme
     ports:
       - '0.0.0.0:80:80'
       - '0.0.0.0:443:443'
@@ -50,8 +50,8 @@ services:
   awscli:
     build:
       context: .
-      dockerfile: ./compose/production/aws/Dockerfile
+      dockerfile: ./compose/staging/aws/Dockerfile
     env_file:
-      - ./.envs/.production/.django
+      - ./.envs/.staging/.django
     volumes:
-      - production_postgres_data_backups:/backups:z
+      - staging_postgres_data_backups:/backups:z
