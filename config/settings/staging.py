@@ -8,7 +8,7 @@ from .base import env
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["api.bddw.com"])
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["staging-api.bddw.com"])
 
 # DATABASES
 # ------------------------------------------------------------------------------
@@ -200,6 +200,7 @@ SENTRY_ENV_DSN = env("DJANGO_SENTRY_ENV_DSN", None)
 if SENTRY_ENV_DSN:
     sentry_sdk.init(
         dsn=f"{SENTRY_ENV_DSN}",
+        environment='staging',
         # Set traces_sample_rate to 1.0 to capture 100%
         # of transactions for performance monitoring.
         traces_sample_rate=1.0,

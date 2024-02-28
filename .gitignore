@@ -332,3 +332,4 @@ api_bddw_com/media/
 .env
 .envs/*
 !.envs/.local/
+.envs
