@@ -98,7 +98,7 @@ class MenuListAdmin(VersionAdmin):
 
 @admin.register(MenuListItem)
 class MenuListItemAdmin(VersionAdmin):
-    list_display = ("name", "menu_list", "order", "image", "url", "updated_on")
+    list_display = ("name", "menu_list", "order", "image", "get_absolute_url_link", "updated_on")
     list_filter = ("menu_list",)
     search_fields = ("name", "menu_list__name", "image")
     fields = ["name", "menu_list", "image_thumbnail", "url", "order"]

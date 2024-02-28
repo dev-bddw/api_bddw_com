@@ -179,6 +179,14 @@ class MenuListItem(models.Model):
     order = models.IntegerField(help_text="order item to appear")
     updated_on = models.DateTimeField(auto_now=True)
 
+
+    def get_absolute_url(self):
+        return 'https://bddw.com' + f'{self.url}'
+
+    def get_absolute_url_link(self):
+        link = 'https://bddw.com' + f'{self.url}'
+        return format_html(f'<a href="{link}">{link}</a>')
+
     def save(self, *args, **kwargs):
         self.image.create_invalidation()
         super().save(*args, **kwargs)
