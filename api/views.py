@@ -13,6 +13,7 @@ special_cases = {
     "sev-drulo-sectional-sofa": "sev-drulo sectional sofa",
     "wall-mount-luggage-rack": "Wall-mount Luggage Rack",
     "sev-drulo-ottoman": "sev-drulo ottoman",
+    "robe-tile-coffe-table": "robe-tile coffee table",
 }
 
 

@@ -9,7 +9,7 @@ from django.db import models
 from django.db.models.fields.files import ImageFieldFile
 from django.utils.deconstruct import deconstructible
 from PIL import Image
-
+from django.utils.html import format_html
 
 @deconstructible
 class LowercaseRename(object):
@@ -63,6 +63,10 @@ class Product(models.Model):
     def get_absolute_url(self):
 
         return f"https://bddw.com/product/{self.slugify()}"
+
+    def get_absolute_url_link(self):
+        link = f'https://bddw.com/product/{self.slugify()}'
+        return format_html(f'<a href="{link}">{link}</a>')
 
     def get_blurb_preview(self):
         return f"{self.blurb[0:100]}..."
@@ -151,6 +155,10 @@ class MenuList(models.Model):
     def get_absolute_url(self):
 
         return f"https://bddw.com/list/{self.slugify()}"
+
+    def get_absolute_url_link(self):
+        link = f'https://bddw.com/list/{self.slugify()}'
+        return format_html(f'<a href="{link}">{link}</a>')
 
     def number_of_list_items(self):
         return len(MenuListItem.objects.filter(menu_list_id=self.id))
