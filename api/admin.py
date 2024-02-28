@@ -41,6 +41,7 @@ class ProductImageInline(admin.TabularInline):
     fields = ["image_thumbnail", "image", "order", "caption"]
     readonly_fields = ["image_thumbnail"]  # Ensure image_thumbnail is treated as a read-only field,
 
+
     def image_thumbnail(self, obj):
         return format_html('<img src="{}" width="75" />', obj.thumbnail.url)
 
@@ -61,6 +62,7 @@ class ProductImageAdmin(VersionAdmin):
     fields = ["image_thumbnail", "image", "product", "order", "caption"]
     readonly_fields = ["image_thumbnail"]  # Ensure image_thumbnail is treated as a read-only field
     ordering = ['-updated_on']
+    list_per_page = 20
 
     def image_thumbnail_list(self, obj):
         return format_html('<img src="{}" height="40"  />', obj.thumbnail.url)
