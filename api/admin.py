@@ -13,13 +13,14 @@ class DropDownMenuAdmin(VersionAdmin):
 
 @admin.register(LandingPageImage)
 class LandingPageImageAdmin(VersionAdmin):
-    list_display = ["thumbnail_list_display", "dimensions", "image_name"]
+    list_display = ["thumbnail_list_display", "dimensions", "image_name", "updated_on"]
     fields = [
         "image_display",
         "image",
     ]
 
     readonly_fields = ["image_display"]  # Ensure image_thumbnail is treated as a read-only field,
+    ordering = ['-updated_on']
 
     def image_display(self, obj):
         return format_html('<img src="{}" width="1500" />', obj.image.url)
@@ -47,17 +48,19 @@ class ProductImageInline(admin.TabularInline):
 @admin.register(Product)
 class ProductAdmin(VersionAdmin):
     inlines = [ProductImageInline]
-    list_display = ("name", "get_absolute_url", "image_number", "get_blurb_preview")
+    list_display = ("name", "get_absolute_url_link", "image_number", "get_blurb_preview", "updated_on")
     search_fields = ("name",)
+    ordering = ['-updated_on']
 
 
 @admin.register(ProductImage)
 class ProductImageAdmin(VersionAdmin):
-    list_display = ("image_thumbnail_list", "product", "order", "image", "created_on", "dimensions")
+    list_display = ("image_thumbnail_list", "product", "order", "image", "updated_on", "dimensions")
     list_filter = ("product",)
     search_fields = ("product__name", "image")
     fields = ["image_thumbnail", "image", "product", "order", "caption"]
     readonly_fields = ["image_thumbnail"]  # Ensure image_thumbnail is treated as a read-only field
+    ordering = ['-updated_on']
 
     def image_thumbnail_list(self, obj):
         return format_html('<img src="{}" height="40"  />', obj.thumbnail.url)
@@ -89,17 +92,18 @@ class MenuListItemInline(admin.TabularInline):
 @admin.register(MenuList)
 class MenuListAdmin(VersionAdmin):
     inlines = [MenuListItemInline]
-    list_display = ("name", "get_absolute_url", "number_of_list_items", "created_on")
+    list_display = ("name", "get_absolute_url_link", "number_of_list_items", "updated_on")
     search_fields = ["name"]
-
+    ordering = ['-updated_on']
 
 @admin.register(MenuListItem)
 class MenuListItemAdmin(VersionAdmin):
-    list_display = ("name", "menu_list", "order", "image", "url")
+    list_display = ("name", "menu_list", "order", "image", "url", "updated_on")
     list_filter = ("menu_list",)
     search_fields = ("name", "menu_list__name", "image")
     fields = ["name", "menu_list", "image_thumbnail", "url", "order"]
     readonly_fields = ["image_thumbnail"]  # Ensure image_thumbnail is treated as a read-only field
+    ordering = ['-updated_on']
 
     def image_thumbnail(self, obj):
         return format_html('<img src="{}" width="75" />', obj.image.url)
