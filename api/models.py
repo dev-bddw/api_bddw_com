@@ -61,8 +61,11 @@ class Product(models.Model):
         return self.name.lower().replace(" ", "-")
 
     def get_absolute_url(self):
-
-        return f"https://bddw.com/product/{self.slugify()}"
+        full_url = self.url.startswith('http')
+        if not full_url:
+            return f"https://bddw.com/product/{self.slugify()}"
+        else:
+            return self.url
 
     def get_absolute_url_link(self):
         link = f'https://bddw.com/product/{self.slugify()}'
@@ -175,17 +178,24 @@ class MenuListItem(models.Model):
     image = CloudFrontImageField(
         help_text="'thumbnail' image you want for this menu item", upload_to=LowercaseRename("")
     )
-    url = models.CharField(help_text="path for linking: /list/list-name or /product/product-name", max_length=255)
+    url = models.CharField(help_text="path for linking: /list/list-name or /product/product-name - outide links must start with http", max_length=255)
     order = models.IntegerField(help_text="order item to appear")
     updated_on = models.DateTimeField(auto_now=True)
 
+    def get_absolute_url_link(self):
+        full_url = self.url.startswith('http')
+        if not full_url:
+            link = "https://bddw.com" + f"{self.url}"
+        else:
+            link = self.url
+        return format_html(f'<a href="{link}">{link}</a>')
 
     def get_absolute_url(self):
-        return 'https://bddw.com' + f'{self.url}'
-
-    def get_absolute_url_link(self):
-        link = 'https://bddw.com' + f'{self.url}'
-        return format_html(f'<a href="{link}">{link}</a>')
+        full_url = self.url.startswith('http')
+        if not full_url:
+            return 'https://bddw.com' + f'{self.url}'
+        else:
+            return self.url
 
     def save(self, *args, **kwargs):
         self.image.create_invalidation()
