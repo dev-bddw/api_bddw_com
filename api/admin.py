@@ -153,13 +153,18 @@ class ProductImageAdmin(VersionAdmin):
     to the admin interface for ProductImage model.
     """
 
-    list_display = ("image_thumbnail_list", "product", "order", "image", "updated_on", "dimensions")
+    list_display = ("image_thumbnail_list", "product", "order", "image", "updated_on", "dimensions", 'image_file_size')
     list_filter = ("product",)
     search_fields = ("product__name", "image")
     fields = ["image_thumbnail", "image", "product", "order", "caption"]
     readonly_fields = ["image_thumbnail"]  # Ensure image_thumbnail is treated as a read-only field
     ordering = ["-updated_on"]
     list_per_page = 20
+
+    def image_file_size(self, obj):
+        img_mb = obj.image.size / 1048576
+        too_big = img_mb > 1
+        return format_html(f'<p style="color: {'red' if too_big == True else 'black'};">{round(img_mb, 3)} mb</p>')
 
     def image_thumbnail_list(self, obj):
         """
@@ -242,6 +247,8 @@ class MenuListAdmin(VersionAdmin):
     ordering = ["-updated_on"]
 
 
+
+
 @admin.register(MenuListItem)
 class MenuListItemAdmin(VersionAdmin):
     """
@@ -251,13 +258,35 @@ class MenuListItemAdmin(VersionAdmin):
 
     """
 
-    list_display = ("name", "menu_list", "order", "image", "get_absolute_url_link", "updated_on")
+    list_display = ("name", "menu_list", "order", "image", "get_absolute_url_link", 'dimensions', 'image_file_size', "updated_on")
     list_filter = ("menu_list",)
     search_fields = ("name", "menu_list__name", "image")
     fields = ["name", "menu_list", "image_thumbnail", "image", "url", "link_health", "order"]
     readonly_fields = ["image_thumbnail", "link_health"]  # Ensure image_thumbnail is treated as a read-only field
     ordering = ["-updated_on"]
     list_per_page = 25
+
+    def image_file_size(self, obj):
+        img_mb = obj.image.size / 1048576
+        too_big = img_mb > 1
+        return format_html(f'<p style="color: {'red' if too_big == True else 'black'};">{round(img_mb, 3)}mb</p>')
+
+
+
+    def dimensions(self, obj):
+        """
+        Method to display the dimensions of the image.
+
+        Args:
+            obj (LandingPageImage): The LandingPageImage instance.
+
+        Returns:
+            str: HTML string displaying the width and height of the image.
+        """
+        width, height = obj.image.width, obj.image.height
+        return format_html("<p>{} x {}</p>", width, height)
+
+
 
     def image_thumbnail(self, obj):
         """
