@@ -1,7 +1,7 @@
 import sentry_sdk
-
 from .base import *  # noqa
 from .base import env
+from boto3 import Session
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -209,3 +209,54 @@ if SENTRY_ENV_DSN:
         # We recommend adjusting this value in production.
         profiles_sample_rate=1.0,
     )
+
+# AWS CLOUD WATCH LOGGING
+# --------------------------------------------------------------------------------
+
+CLOUDWATCH_AWS_ID = env("CLOUDWATCH_AWS_ID")
+CLOUDWATCH_AWS_KEY = env("CLOUDWATCH_AWS_KEY")
+AWS_DEFAULT_REGION = env("AWS_DEFAULT_REGION", default="us-east-1")
+
+boto3_session = Session(
+    aws_access_key_id=CLOUDWATCH_AWS_ID,
+    aws_secret_access_key=CLOUDWATCH_AWS_KEY,
+    region_name=AWS_DEFAULT_REGION,
+)
+
+logger_client = boto3_session.client("logs")
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "aws": {
+            "format": "%(asctime)s [%(levelname)-8s] %(message)s [%(pathname)s:%(lineno)d]",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "handlers": {
+        "watchtower": {
+            "level": "DEBUG",
+            "class": "watchtower.CloudWatchLogHandler",
+            "boto3_client": logger_client,
+            "log_group": "api-bddw-com",
+            "stream_name": "staging",
+            "create_log_group": True,
+            "create_log_stream": True,
+            "formatter": "aws",
+        },
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "aws",
+        },
+    },
+    "loggers": {
+        # Use this logger to send data just to Cloudwatch
+        "watchtower": {
+            "level": "DEBUG",
+            "handlers": ["watchtower"],
+            "propogate": False,
+        }
+    },
+}
+

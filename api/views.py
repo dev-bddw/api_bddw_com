@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
+import logging
 
 from .models import DropDownMenu, LandingPageImage, MenuList, Product
 from .serializers import DropDownMenuSerializer, LandingPageImageSerializer, MenuListSerializer, ProductSerializer
@@ -16,6 +17,7 @@ special_cases = {
     "robe-tile-coffe-table": "robe-tile coffee table",
 }
 
+logger = logging.getLogger('watchtower')
 
 @api_view(["GET", "PUT"])
 @parser_classes([MultiPartParser, FormParser])
@@ -23,42 +25,44 @@ def api_response(request, slug=None):
     instance = None
     serializer_class = None
 
+    # Log the request method and slug
+    logger.info(f"Received {request.method} request for slug: {slug}")
+
     if slug not in special_cases.keys():
         slug = slug.lower().replace("-", " ").replace("captains", "captain's").replace("admirals", "admiral's")
-
     else:
         slug = special_cases[slug]
 
-    # Try to get MenuList by slug
     try:
         instance = MenuList.objects.get(name__iexact=slug)
         serializer_class = MenuListSerializer
+        logger.info(f"MenuList instance found for slug: {slug}")
     except MenuList.DoesNotExist:
-        # If MenuList not found, try to get Product by slug
         try:
             instance = Product.objects.get(name__iexact=slug)
             serializer_class = ProductSerializer
+            logger.info(f"Product instance found for slug: {slug}")
         except Product.DoesNotExist:
-            # If neither is found, return an error response
+            logger.error(f"No matching MenuList or Product found for slug: {slug}")
             return Response({"error": "No matching MenuList or Product found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Handle GET request
     if request.method == "GET":
         serializer = serializer_class(instance)
         body_response = {"body": serializer.data}
+        logger.info(f"GET request successful for slug: {slug}, returning data")
         return Response(body_response, status=status.HTTP_200_OK)
 
-    # Handle PUT request
     elif request.method == "PUT":
         serializer = serializer_class(instance, data=request.data)
         if serializer.is_valid():
             serializer.save()
+            logger.info(f"PUT request successful for slug: {slug}, data updated")
             return Response(serializer.data)
+        logger.warning(f"PUT request data invalid for slug: {slug}, returning errors")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # Other HTTP methods are not supported
+    logger.warning(f"Method {request.method} not allowed for slug: {slug}")
     return Response({"error": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
 
 @api_view(["POST"])
 @parser_classes([MultiPartParser, FormParser])
