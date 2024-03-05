@@ -30,7 +30,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductImage
-        fields = ["image", "thumbnail", "order", "caption"]
+        fields = ['id', "image", "thumbnail", "order", "caption"]
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -38,7 +38,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ["name", "blurb", "meta", "images"]
+        fields = ['id', "name", "blurb", "meta", "images"]
 
     def create(self, validated_data):
 
@@ -68,7 +68,7 @@ class MenuListItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MenuListItem
-        fields = ["name", "image", "url", "order"]
+        fields = ['id', "name", "image", "url", "order"]
 
 
 class MenuListSerializer(serializers.ModelSerializer):
@@ -76,7 +76,7 @@ class MenuListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MenuList
-        fields = ["name", "meta", "records"]
+        fields = ['id', "name", "meta", "records"]
 
     def create(self, validated_data):
         print("Validated data:", validated_data)
