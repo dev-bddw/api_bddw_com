@@ -1,7 +1,10 @@
+import logging
+
 from rest_framework import serializers
 
 from .models import DropDownMenu, LandingPageImage, MenuList, MenuListItem, Product, ProductImage
 
+logger = logging.getLogger('watchtower')
 
 class DropDownMenuSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,7 +29,15 @@ class LandingPageImageSerializer(serializers.ModelSerializer):
 class ProductImageSerializer(serializers.ModelSerializer):
 
     image = ImageNameField()
-    thumbnail = ImageNameField()
+    thumbnail = ImageNameField(required=False)
+
+    def create(self, validated_data):
+        logger.info(f'Attempting to create product image with {validated_data}')
+        product_id = validated_data.pop('product')
+        #product = Product.objects.get(pk=product_data)
+        product_image = ProductImage.objects.create(product=product_id, **validated_data)
+        logger.info(f'Created {product_image}')
+        return product_image
 
     class Meta:
         model = ProductImage
