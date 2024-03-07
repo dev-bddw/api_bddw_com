@@ -33,11 +33,13 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         logger.info(f'Attempting to create product image with {validated_data}')
-        product_id = validated_data.pop('product')
-        #product = Product.objects.get(pk=product_data)
-        product_image = ProductImage.objects.create(product=product_id, **validated_data)
-        logger.info(f'Created {product_image}')
-        return product_image
+        product_images = []
+        for item in validated_data:
+            product_id = item.pop('product')
+            product_image = ProductImage.objects.create(product=product_id, **item)
+            product_images.append(product_image)
+            logger.info(f'Created {product_image}')
+        return product_images
 
     class Meta:
         model = ProductImage
