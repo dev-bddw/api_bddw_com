@@ -130,7 +130,7 @@ def product_images(request, product_image_id=None):
 
         logger.info(f"Received POST request for ProductImage w/ body: {request.data}")
         request_data = request.data
-        serializer = serializer_class(data=request_data)
+        serializer = serializer_class(data=request_data, many=True)
         logger.info(f"POST body is valid{serializer.is_valid()}")
         if serializer.is_valid():
             serializer.save()
