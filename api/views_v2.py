@@ -1,22 +1,14 @@
+import logging
+
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from django.http import HttpResponse
-import logging
 
-from .models import DropDownMenu, LandingPageImage, MenuList, Product
-from .serializers import DropDownMenuSerializer, LandingPageImageSerializer, MenuListSerializer, ProductSerializer
-
-special_cases = {
-    "sev-drulo-series": "sev-drulo series",
-    "sev-drulo-sofa": "sev-drulo sofa",
-    "sev-drulo-club-chair": "sev-drulo club chair",
-    "sev-drulo-sectional-sofa": "sev-drulo sectional sofa",
-    "wall-mount-luggage-rack": "Wall-mount Luggage Rack",
-    "sev-drulo-ottoman": "sev-drulo ottoman",
-    "robe-tile-coffe-table": "robe-tile coffee table",
-}
+from .models import DropDownMenu, LandingPageImage, MenuList, Product, ProductImage
+from .serializers import DropDownMenuSerializer, LandingPageImageSerializer, MenuListSerializer, ProductSerializer, ProductImageSerializer
+from .helpers import handle_special_cases
 
 logger = logging.getLogger('watchtower')
 
@@ -29,10 +21,7 @@ def products(request, product_name_slug):
     # Log the request method and slug
     logger.info(f"Received {request.method} request for slug: {product_name_slug}")
 
-    if product_name_slug not in special_cases.keys():
-        product_name_slug = product_name_slug.lower().replace("-", " ").replace("captains", "captain's").replace("admirals", "admiral's")
-    else:
-        product_name_slug = special_cases[product_name_slug]
+    product_name_slug = handle_special_cases(product_name_slug)
 
     instance = Product.objects.get(name__iexact=product_name_slug)
     serializer_class = ProductSerializer
@@ -66,10 +55,7 @@ def menu_lists(request, menu_list_slug):
     # Log the request method and slug
     logger.info(f"Received {request.method} request for slug: {menu_list_slug}")
 
-    if menu_list_slug not in special_cases.keys():
-        menu_list_slug = menu_list_slug.lower().replace("-", " ").replace("captains", "captain's").replace("admirals", "admiral's")
-    else:
-        menu_list_slug = special_cases[menu_list_slug]
+    menu_list_slug = handle_special_cases(menu_list_slug)
 
     instance = MenuList.objects.get(name__iexact=menu_list_slug)
     serializer_class = MenuListSerializer
@@ -80,6 +66,34 @@ def menu_lists(request, menu_list_slug):
         body_response = {"body": serializer.data}
         logger.info(f"GET request successful for slug: {menu_list_slug}, returning data")
         return Response(body_response, status=status.HTTP_200_OK)
+
+    elif request.method == 'POST':
+        records_data = []
+        for key in request.data.keys():
+            if key.startswith("records["):
+                index, field = key.split("[")[1].split("].")
+                index = int(index)  # Convert index to integer
+
+                # Initialize a new dictionary or update existing
+                while index >= len(records_data):
+                    records_data.append({})
+                records_data[index][field] = request.data[key]
+
+        # Include the images data in the request data
+        request_data = {
+            "name": request.data.get("name"),
+            "meta": request.data.get("meta"),
+            "records": records_data,
+        }
+
+        # Handle POST request
+        serializer = MenuListSerializer(data=request_data)
+        if serializer.is_valid():
+            serializer.save()
+            logger.info(f"POST request successful for slug: {menu_list_slug}, MenuList created")
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     elif request.method == "PUT":
         serializer = serializer_class(instance, data=request.data)
@@ -106,17 +120,27 @@ def menu_list_items(request, menu_list_item_id):
     else:
         return HttpResponse("HTTP method not supported", status=405)
 
-@api_view(["GET", "PUT"])
+@api_view(["POST"])
 @parser_classes([MultiPartParser, FormParser])
-def product_images(request, product_image_id):
-    if request.method == 'GET':
-        # Handle GET request
-        pass
-    elif request.method == 'POST':
-        # Handle POST request
-        pass
-    else:
-        return HttpResponse("HTTP method not supported", status=405)
+def product_images(request, product_image_id=None):
+
+    serializer_class = ProductImageSerializer
+
+    if request.method == 'POST':
+
+        logger.info(f"Received POST request for ProductImage")
+        request_data = request.data
+
+         # Handle POST request
+        serializer = serializer_class(data=request_data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            logger.info(f"POST request successful for ProductImage, ProductImage created")
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    return Response({"error": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(["GET", "PUT"])

@@ -20,6 +20,7 @@ urlpatterns += [
     path('v2/products/<product_name_slug>', products),
     path('v2/menu-lists/<menu_list_slug>', menu_lists),
     path('v2/menu-list-items/<menu_list_item_id>', menu_list_items),
+    path('v2/product-images/', product_images),
     path('v2/product-images/<product_image_id>', product_images),
     path('v2/landing-page-images/<landing_page_image_id>', landing_page_images),
     # To Do add drop down menu
