@@ -130,11 +130,22 @@ def product_images(request, product_image_id=None):
 
         logger.info(f"Received POST request for ProductImage w/ body: {request.data}")
         request_data = request.data
-        serializer = serializer_class(data=request_data, many=True)
-        logger.info(f"POST body is valid{serializer.is_valid()}")
+
+        index = 0
+        records_list = []
+
+        while index < len(request_data['image']):
+            record_dict = {}
+            for key,value in request_data.items():
+                record_dict.update({f'{key}': value[index]})
+            records_list.append(record_dict)
+            index += 1
+
+        logger.info(f"POST request data parsed into: {records_list}")
+        serializer = serializer_class(data=records_list, many=True)
         if serializer.is_valid():
             serializer.save()
-            logger.info(f"POST request successful for ProductImage, ProductImage created")
+            logger.info(f"POST request successful for ProductImage, ProductImage created: {serializer.data}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
