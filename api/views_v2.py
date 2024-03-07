@@ -6,8 +6,8 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from django.http import HttpResponse
 
-from .models import DropDownMenu, LandingPageImage, MenuList, Product, ProductImage
-from .serializers import DropDownMenuSerializer, LandingPageImageSerializer, MenuListSerializer, ProductSerializer, ProductImageSerializer
+from .models import MenuList, Product, ProductImage
+from .serializers import MenuListSerializer, ProductSerializer, ProductImageSerializer
 from .helpers import handle_special_cases
 
 logger = logging.getLogger('watchtower')
@@ -120,38 +120,50 @@ def menu_list_items(request, menu_list_item_id):
     else:
         return HttpResponse("HTTP method not supported", status=405)
 
-@api_view(["POST"])
+@api_view(["POST", "DELETE"])
 @parser_classes([MultiPartParser, FormParser])
 def product_images(request, product_image_id=None):
 
-    serializer_class = ProductImageSerializer
+    if request.method == 'DELETE':
+
+        logging.info(f"DELETE request ProductImage with product_image_id: {product_image_id}")
+        try:
+            ProductImage.objects.get(id=product_image_id).delete()
+            logging.info(f"DELETE success product_image_id: {product_image_id}")
+            return Response(status=status.HTTP_200_OK)
+        except ProductImage.DoesNotExist:
+            logging.info(f"DELETE failed product_image_id: {product_image_id}")
+            return Response(status=status.HTTP_200_OK)
 
     if request.method == 'POST':
 
-        logger.info(f"Received POST request for ProductImage w/ body: {request.data}")
-        request_data = request.data
+        logging.info(f"POST request ProductImage with request data: {request.data}")
 
-        index = 0
-        records_list = []
+        images_data = []
 
-        while index < len(request_data['image']):
-            record_dict = {}
-            for key,value in request_data.items():
-                record_dict.update({f'{key}': value[index]})
-            records_list.append(record_dict)
-            index += 1
+        for key in request.data.keys():
+            if key.startswith("productimages["):
+                index, field = key.split("[")[1].split("].")
+                index = int(index)  # Convert index to integer
 
-        logger.info(f"POST request data parsed into: {records_list}")
-        serializer = serializer_class(data=records_list, many=True)
+                # Initialize a new dictionary or update existing
+                while index >= len(images_data):
+                    images_data.append({})
+                images_data[index][field] = request.data[key]
+
+        logging.info(f"POST request data processed into {images_data}")
+
+        serializer = ProductImageSerializer(data=images_data, many=True)
+
         if serializer.is_valid():
             serializer.save()
-            logger.info(f"POST request successful for ProductImage, ProductImage created: {serializer.data}")
+            logging.info(f"POST request successful for ProductImage, ProductImage created: {serializer.data}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+        else:
+            logging.info(f"POST request failed for ProductImage, ProductImage: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     return Response({"error": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
 
 @api_view(["GET", "PUT"])
 @parser_classes([MultiPartParser, FormParser])
