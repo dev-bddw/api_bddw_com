@@ -128,11 +128,12 @@ def product_images(request, product_image_id=None):
 
     if request.method == 'POST':
 
-        logger.info(f"Received POST request for ProductImage")
-        request_data = request.data
+        logger.info(f"Received POST request for ProductImage w/ body: {request.data}")
+        request_data = [request.data]
 
          # Handle POST request
         serializer = serializer_class(data=request_data, many=True)
+        logger.info(f"POST body is valid:{serializer.is_valid()}")
         if serializer.is_valid():
             serializer.save()
             logger.info(f"POST request successful for ProductImage, ProductImage created")
