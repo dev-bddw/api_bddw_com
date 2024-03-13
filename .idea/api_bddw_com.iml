@@ -14,7 +14,7 @@
   </component>
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$" />
-    <orderEntry type="jdk" jdkName="Python 3.11 (.apivenv)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Remote Python 3.12.2 Docker (api_bddw_com_local_django:latest)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PackageRequirementsSettings">
