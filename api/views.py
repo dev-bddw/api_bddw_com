@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 import logging
+from datetime import datetime
 
 from .models import DropDownMenu, LandingPageImage, MenuList, Product
 from .serializers import DropDownMenuSerializer, LandingPageImageSerializer, MenuListSerializer, ProductSerializer
@@ -139,3 +140,14 @@ def api_landing_page_images(request):
     serializer = LandingPageImageSerializer(landing_page_image)
     body_response = {"body": serializer.data}
     return Response(body_response)
+
+
+@api_view(["GET"])
+def health_check(request):
+    """Simple health check endpoint to verify deployment updates"""
+    return Response({
+        "status": "healthy",
+        "environment": "staging",
+        "deployed_at": "2025-01-08 15:30:00 UTC",  
+        "message": "Staging API is live and responding to updates!"
+    })
