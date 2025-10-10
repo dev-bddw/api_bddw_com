@@ -1,9 +1,9 @@
 
 # define an alias for the specific python version used in this file.
-FROM docker.io/python3.11-nodejs21-slim	 as python
+FROM docker.io/python:3.11-slim as python
 
 # Python build stage
-FROM docker.io/python as python-build-stage
+FROM python as python-build-stage
 
 ARG BUILD_ENVIRONMENT=production
 
@@ -23,7 +23,7 @@ RUN pip wheel --wheel-dir /usr/src/app/wheels  \
 
 
 # Python 'run' stage
-FROM docker.io/python as python-run-stage
+FROM python as python-run-stage
 
 ARG BUILD_ENVIRONMENT=production
 ARG APP_HOME=/app
