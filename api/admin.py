@@ -164,7 +164,8 @@ class ProductImageAdmin(VersionAdmin):
     def image_file_size(self, obj):
         img_mb = obj.image.size / 1048576
         too_big = img_mb > 1
-        return format_html(f'<p style="color: {'red' if too_big == True else 'black'};">{round(img_mb, 3)} mb</p>')
+        color = 'red' if too_big else 'black'
+        return format_html(f'<p style="color: {color};">{round(img_mb, 3)} mb</p>')
 
     def image_thumbnail_list(self, obj):
         """
@@ -269,7 +270,8 @@ class MenuListItemAdmin(VersionAdmin):
     def image_file_size(self, obj):
         img_mb = obj.image.size / 1048576
         too_big = img_mb > 1
-        return format_html(f'<p style="color: {'red' if too_big == True else 'black'};">{round(img_mb, 3)}mb</p>')
+        color = 'red' if too_big else 'black'
+        return format_html(f'<p style="color: {color};">{round(img_mb, 3)}mb</p>')
 
 
 
