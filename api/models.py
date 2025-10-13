@@ -214,3 +214,35 @@ class DropDownMenu(models.Model):
 
     def __str__(self):
         return f"BDDW.COM DROPDOWN MENU {self.id}"
+
+
+class LandingPageVersion(models.Model):
+    """A landing page version/arrangement"""
+    name = models.CharField(max_length=100, unique=True)
+    
+    def __str__(self):
+        return self.name
+
+
+class LandingPageFile(models.Model):
+    """Individual files for each landing page version"""
+    FILE_TYPE_CHOICES = [
+        ('horizontal_background', 'Horizontal Background'),
+        ('vertical_background', 'Vertical Background'),
+        ('horizontal_map', 'Horizontal Map'),
+        ('vertical_map', 'Vertical Map'),
+        ('logo', 'Logo'),
+        ('catalog', 'Catalog'),
+        ('auction', 'Auction'),
+    ]
+    
+    version = models.ForeignKey(LandingPageVersion, on_delete=models.CASCADE, related_name='files')
+    file_type = models.CharField(max_length=25, choices=FILE_TYPE_CHOICES)
+    image = CloudFrontImageField(upload_to=LowercaseRename('landing_pages/'))
+    
+    class Meta:
+        unique_together = ['version', 'file_type']
+
+    
+    def __str__(self):
+        return f"{self.version.name} - {self.get_file_type_display()}"

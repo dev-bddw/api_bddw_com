@@ -4,7 +4,7 @@ from reversion.admin import VersionAdmin
 import requests
 
 from .forms import DropDownMenuModelForm
-from .models import DropDownMenu, LandingPageImage, MenuList, MenuListItem, Product, ProductImage
+from .models import DropDownMenu, LandingPageImage, LandingPageVersion, LandingPageFile, MenuList, MenuListItem, Product, ProductImage
 
 
 @admin.register(DropDownMenu)
@@ -332,3 +332,58 @@ admin.site.unregister(Product)
 admin.site.register(Product, ProductAdmin)
 admin.site.unregister(MenuList)
 admin.site.register(MenuList, MenuListAdmin)
+
+
+class LandingPageFileInline(admin.TabularInline):
+    """Inline model to display LandingPageFile objects related to a specific LandingPageVersion"""
+    
+    model = LandingPageFile
+    extra = 7  # One for each file type
+    fields = ["file_type", "image_thumbnail", "image"]
+    readonly_fields = ["image_thumbnail"]
+    
+    def image_thumbnail(self, obj):
+        """Returns the HTML representation of the image thumbnail"""
+        if obj.image:
+            return format_html('<img src="{}" width="75" />', obj.image.url)
+        return "No image"
+
+
+@admin.register(LandingPageVersion)
+class LandingPageVersionAdmin(VersionAdmin):
+    """Admin interface for LandingPageVersion with inline files"""
+    
+    inlines = [LandingPageFileInline]
+    list_display = ["name", "file_count"]
+    search_fields = ["name"]
+    ordering = ["name"]
+    
+    def file_count(self, obj):
+        """Returns the number of files for this version"""
+        return obj.files.count()
+
+
+@admin.register(LandingPageFile)
+class LandingPageFileAdmin(VersionAdmin):
+    """Admin interface for LandingPageFile"""
+    
+    list_display = ["version", "file_type", "image_thumbnail", "image_name"]
+    list_filter = ["file_type", "version"]
+    search_fields = ["version__name", "file_type"]
+    fields = ["version", "file_type", "image_thumbnail", "image"]
+    readonly_fields = ["image_thumbnail"]
+    ordering = ["version", "file_type"]
+    
+    def image_thumbnail(self, obj):
+        """Returns the HTML representation of the image thumbnail"""
+        if obj.image:
+            return format_html('<img src="{}" width="75" />', obj.image.url)
+        return "No image"
+    
+    def image_name(self, obj):
+        """Returns the name of the image file"""
+        return obj.image.name if obj.image else "No image"
+
+
+# Unregister LandingPageFile from admin - it will only appear inline
+admin.site.unregister(LandingPageFile)

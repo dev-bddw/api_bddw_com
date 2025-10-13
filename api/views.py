@@ -5,8 +5,8 @@ from rest_framework.response import Response
 import logging
 from datetime import datetime
 
-from .models import DropDownMenu, LandingPageImage, MenuList, Product
-from .serializers import DropDownMenuSerializer, LandingPageImageSerializer, MenuListSerializer, ProductSerializer
+from .models import DropDownMenu, LandingPageImage, LandingPageVersion, MenuList, Product
+from .serializers import DropDownMenuSerializer, LandingPageImageSerializer, LandingPageVersionSerializer, MenuListSerializer, ProductSerializer
 ####
 special_cases = {
     "sev-drulo-series": "sev-drulo series",
@@ -151,3 +151,27 @@ def health_check(request):
         "deployed_at": "2025-01-08 15:30:00 UTC",  
         "message": "Staging API is live and responding to updates!"
     })
+
+
+@api_view(["GET"])
+def api_landing_pages(request):
+    """Get a random landing page version with all its files"""
+    import random
+    
+    # Get all active landing page versions
+    versions = LandingPageVersion.objects.all()
+    
+    if not versions.exists():
+        return Response({
+            "error": "No landing page versions found"
+        }, status=status.HTTP_404_NOT_FOUND)
+    
+    # Select a random version
+    random_version = random.choice(versions)
+    
+    # Serialize the version with its files
+    serializer = LandingPageVersionSerializer(random_version)
+    
+    return Response({
+        "body": serializer.data
+    }, status=status.HTTP_200_OK)

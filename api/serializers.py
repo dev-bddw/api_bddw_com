@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import DropDownMenu, LandingPageImage, MenuList, MenuListItem, Product, ProductImage
+from .models import DropDownMenu, LandingPageImage, LandingPageVersion, LandingPageFile, MenuList, MenuListItem, Product, ProductImage
 
 
 class DropDownMenuSerializer(serializers.ModelSerializer):
@@ -98,3 +98,19 @@ class MenuListSerializer(serializers.ModelSerializer):
                 MenuListItem.objects.create(menu_list=instance, **record_data)
 
         return instance
+
+
+class LandingPageFileSerializer(serializers.ModelSerializer):
+    image = ImageNameField()
+    
+    class Meta:
+        model = LandingPageFile
+        fields = ['id', 'file_type', 'image']
+
+
+class LandingPageVersionSerializer(serializers.ModelSerializer):
+    files = LandingPageFileSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = LandingPageVersion
+        fields = ['id', 'name', 'files']
