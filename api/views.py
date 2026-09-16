@@ -19,6 +19,31 @@ special_cases = {
 
 logger = logging.getLogger('watchtower')
 
+
+def _lookup_name(name):
+    """Look up a MenuList or Product by exact (case-insensitive) name."""
+    try:
+        return MenuList.objects.get(name__iexact=name), MenuListSerializer
+    except MenuList.DoesNotExist:
+        try:
+            return Product.objects.get(name__iexact=name), ProductSerializer
+        except Product.DoesNotExist:
+            return None, None
+
+
+def _singular_plural_variants(name):
+    """Cheap suffix-based singular/plural alternates to retry on a failed lookup."""
+    variants = []
+    if name.endswith("es"):
+        variants.append(name[:-2])
+    if name.endswith("s"):
+        variants.append(name[:-1])
+    if not name.endswith("s"):
+        variants.append(f"{name}s")
+        variants.append(f"{name}es")
+    return variants
+
+
 @api_view(["GET", "PUT"])
 @parser_classes([MultiPartParser, FormParser])
 def api_response(request, slug=None):
@@ -33,18 +58,18 @@ def api_response(request, slug=None):
     else:
         slug = special_cases[slug]
 
-    try:
-        instance = MenuList.objects.get(name__iexact=slug)
-        serializer_class = MenuListSerializer
-        logger.info(f"MenuList instance found for slug: {slug}")
-    except MenuList.DoesNotExist:
-        try:
-            instance = Product.objects.get(name__iexact=slug)
-            serializer_class = ProductSerializer
-            logger.info(f"Product instance found for slug: {slug}")
-        except Product.DoesNotExist:
-            logger.error(f"No matching MenuList or Product found for slug: {slug}")
-            return Response({"error": "No matching MenuList or Product found"}, status=status.HTTP_404_NOT_FOUND)
+    instance, serializer_class = _lookup_name(slug)
+
+    if instance is None:
+        for variant in _singular_plural_variants(slug):
+            instance, serializer_class = _lookup_name(variant)
+            if instance is not None:
+                logger.info(f"Matched slug '{slug}' via singular/plural fallback to '{variant}'")
+                break
+
+    if instance is None:
+        logger.error(f"No matching MenuList or Product found for slug: {slug}")
+        return Response({"error": "No matching MenuList or Product found"}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
         serializer = serializer_class(instance)
